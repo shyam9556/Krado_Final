@@ -404,9 +404,9 @@ export function Work() {
           const panelIndex = Math.min(
             Math.round(self.progress * (N - 1)), N - 1
           );
-          setActiveIndex(panelIndex);
 
           if (prevActiveRef.current !== panelIndex) {
+            setActiveIndex(panelIndex);
             prevActiveRef.current = panelIndex;
             if (panelIndex < projectPanels.length && !noMotion) {
               activateProjectPanel(projectPanels, panelIndex);
@@ -425,19 +425,24 @@ export function Work() {
         const floatIcons = panel.querySelectorAll<HTMLElement>(".work-float-icon");
         const bgGlow     = panel.querySelector<HTMLElement>(".work-panel-glow");
 
+        let rafId: number | null = null;
         const onMove = (e: MouseEvent) => {
-          const rect = panel.getBoundingClientRect();
-          const x = (e.clientX - rect.left) / rect.width - 0.5;  // -0.5 … +0.5
-          const y = (e.clientY - rect.top)  / rect.height - 0.5;
+          if (rafId) return;
+          rafId = requestAnimationFrame(() => {
+            const rect = panel.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / rect.width - 0.5;  // -0.5 … +0.5
+            const y = (e.clientY - rect.top)  / rect.height - 0.5;
 
-          if (img)     gsap.to(img,     { x: x * -24, y: y * -14, duration: 1.1, ease: "power2.out", overwrite: "auto" });
-          if (content) gsap.to(content, { rotateY: x * 5, rotateX: y * -3, duration: 1.1, ease: "power2.out", overwrite: "auto" });
-          if (mesh)    gsap.to(mesh,    { rotateX: y * -12, rotateY: x * 14, "--mouse-x": `${e.clientX - rect.left}px`, "--mouse-y": `${e.clientY - rect.top}px`, duration: 1.4, ease: "power2.out", overwrite: "auto" });
-          if (bgGlow)  gsap.to(bgGlow,  { x: x * 400, y: y * 400, duration: 2, ease: "power2.out", overwrite: "auto" });
+            if (img)     gsap.to(img,     { x: x * -24, y: y * -14, duration: 1.1, ease: "power2.out", overwrite: true });
+            if (content) gsap.to(content, { rotateY: x * 5, rotateX: y * -3, duration: 1.1, ease: "power2.out", overwrite: true });
+            if (mesh)    gsap.to(mesh,    { rotateX: y * -12, rotateY: x * 14, "--mouse-x": `${e.clientX - rect.left}px`, "--mouse-y": `${e.clientY - rect.top}px`, duration: 1.4, ease: "power2.out", overwrite: true });
+            if (bgGlow)  gsap.to(bgGlow,  { x: x * 400, y: y * 400, duration: 2, ease: "power2.out", overwrite: true });
 
-          floatIcons.forEach((icon, i) => {
-            const factor = (i + 1) * 35; // Much stronger parallax shift
-            gsap.to(icon, { x: x * factor, y: y * factor * 0.8, duration: 1.5 + i * 0.2, ease: "power2.out", overwrite: "auto" });
+            floatIcons.forEach((icon, i) => {
+              const factor = (i + 1) * 35; // Much stronger parallax shift
+              gsap.to(icon, { x: x * factor, y: y * factor * 0.8, duration: 1.5 + i * 0.2, ease: "power2.out", overwrite: true });
+            });
+            rafId = null;
           });
         };
 
