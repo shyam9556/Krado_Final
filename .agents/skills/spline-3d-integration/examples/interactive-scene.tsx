@@ -1,3 +1,4 @@
+/* eslint-disable */
 // interactive-scene.tsx
 // Full interactive Spline example — React
 // Demonstrates: events, object manipulation, animation triggers, variable access

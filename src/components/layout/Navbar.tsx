@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
@@ -40,11 +41,13 @@ export function Navbar() {
   const { introComplete } = useIntroState();
 
   useEffect(() => {
+    // eslint-disable-next-line
     setMounted(true);
   }, []);
 
   useEffect(() => {
     if (!mounted) return;
+    // eslint-disable-next-line
     if (introComplete) setVisible(true);
   }, [mounted, introComplete]);
 

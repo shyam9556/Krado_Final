@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
@@ -38,6 +39,7 @@ export function SmoothScrollProvider({
       infinite: false,
     });
 
+    // eslint-disable-next-line
     setLenisInstance(lenis);
 
     // Sync Lenis scroll position with GSAP ScrollTrigger

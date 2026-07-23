@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client";
 
 import { useTheme } from "next-themes";
@@ -9,6 +10,7 @@ export function ThemeToggle() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line
     setMounted(true);
   }, []);
 

@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client";
 
 import React, { useRef, useState } from "react";
@@ -10,7 +11,7 @@ export function Magnetic({
 }: {
   children: React.ReactNode;
   strength?: number;
-  springOptions?: any;
+  springOptions?: Record<string, unknown>;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });

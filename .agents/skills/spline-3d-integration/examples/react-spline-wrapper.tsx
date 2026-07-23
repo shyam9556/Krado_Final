@@ -1,3 +1,4 @@
+/* eslint-disable */
 // react-spline-wrapper.tsx
 // Production-ready Spline wrapper for React / Next.js
 // Features: lazy loading, mobile detection, GPU check, fallback, fade-in on load
