@@ -34,24 +34,7 @@ export function Contact() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // Time clock state
-  const [localTime, setLocalTime] = useState("");
 
-  useEffect(() => {
-    const updateTime = () => {
-      const options: Intl.DateTimeFormatOptions = {
-        timeZone: "America/New_York", // Brand local time
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: true,
-      };
-      setLocalTime(new Date().toLocaleTimeString("en-US", options));
-    };
-    updateTime();
-    const timer = setInterval(updateTime, 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   const toggleService = (service: string) => {
     setSelectedServices((prev) =>
@@ -123,11 +106,7 @@ export function Contact() {
             </p>
 
             <div className="contact-meta-zone">
-              {/* Clock widget */}
-              <div className="contact-clock-widget">
-                <span className="contact-clock-label">NYC OFFICE TIME</span>
-                <span className="contact-clock-time">{localTime || "12:00:00 PM"}</span>
-              </div>
+
 
               {/* Direct email links */}
               <div className="contact-direct-links">
