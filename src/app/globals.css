@@ -3831,51 +3831,6 @@
   transform-origin: left;
 }
 
-/* Big Typographic Outline */
-.footer-logo-outline-container {
-  width: 100%;
-  overflow: hidden;
-  margin-top: 2rem;
-}
-
-.footer-logo-outline {
-  font-family: var(--font-heading);
-  font-size: clamp(3.5rem, 14vw, 11rem);
-  font-weight: 800;
-  text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: transparent;
-  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.04);
-  cursor: pointer;
-  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-  user-select: none;
-}
-
-.footer-logo-outline:hover {
-  color: var(--accent-primary);
-  -webkit-text-stroke: 1px transparent;
-  text-shadow: 0 0 50px rgba(255, 85, 0, 0.35);
-}
-
-@keyframes krado-mobile-pulse {
-  0%, 100% {
-    color: transparent;
-    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.04);
-    text-shadow: none;
-  }
-  50% {
-    color: var(--accent-primary);
-    -webkit-text-stroke: 1px transparent;
-    text-shadow: 0 0 50px rgba(255, 85, 0, 0.35);
-  }
-}
-
-@media (hover: none) and (pointer: coarse) {
-  .footer-logo-outline {
-    animation: krado-mobile-pulse 4s ease-in-out infinite;
-  }
-}
 
 /* Footer Bottom */
 .footer-bottom {

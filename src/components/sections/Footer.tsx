@@ -122,10 +122,16 @@ export function Footer() {
 
         </div>
 
-        {/* Big Outline Typographic Branding */}
-        <div className="footer-logo-outline-container">
-          <div className="footer-logo-outline" onClick={scrollToTop}>
-            KRADO
+        {/* Footer Brand Logo (matches Navbar style) */}
+        <div className="flex justify-center w-full mt-24 mb-12">
+          <div 
+            className="group relative flex items-center gap-3 md:gap-5 cursor-pointer"
+            onClick={scrollToTop}
+          >
+            <span className="w-1.5 md:w-2.5 h-8 md:h-16 bg-accent-primary transform scale-y-50 origin-bottom transition-transform duration-300 group-hover:scale-y-100" />
+            <span className="text-4xl md:text-7xl font-bold tracking-[0.2em] text-foreground font-mono transition-colors duration-300 group-hover:text-accent-primary">
+              KRADO
+            </span>
           </div>
         </div>
 
