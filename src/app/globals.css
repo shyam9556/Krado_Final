@@ -4083,6 +4083,34 @@
     opacity: 0.8;
   }
 }
+/* ── Ken Burns — subtle slow zoom on static posters ──
+   Makes marquee cards feel alive even without video.
+   Pure CSS transform → GPU-composited, near-zero cost.
+   Pauses on hover when the MP4 video takes over. ── */
+.project-marquee-ken-burns {
+  animation: marqueeKenBurns 14s ease-in-out infinite alternate;
+}
+
+@keyframes marqueeKenBurns {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.08);
+  }
+}
+
+/* Pause Ken Burns on hover — video layer is visible, no need to animate underneath */
+.project-marquee-card:hover .project-marquee-ken-burns {
+  animation-play-state: paused;
+}
+
+/* Respect reduced-motion OS setting */
+@media (prefers-reduced-motion: reduce) {
+  .project-marquee-ken-burns {
+    animation: none;
+  }
+}
 
 /* ============================================================
    CONTACT / START A PROJECT SECTION

@@ -277,7 +277,7 @@ function MobileProjectCard({ project, idx }: { project: Project; idx: number }) 
             )
           ) : (
             <>
-              <Image src={project.image} alt={project.imageAlt} fill sizes="(max-width: 768px) 100vw, 50vw" quality={75} className="work-mobile-image group-hover:scale-105 group-hover:brightness-75 transition-all duration-700" priority={idx === 0} />
+              <Image src={project.image} alt={project.imageAlt} fill sizes="(max-width: 768px) 100vw, 50vw" quality={75} className="work-mobile-image group-hover:scale-105 group-hover:brightness-75 transition-all duration-700" priority={idx <= 1} />
               <div className="work-mobile-image-overlay pointer-events-none" />
             </>
           )}
@@ -305,7 +305,7 @@ function MobileProjectCard({ project, idx }: { project: Project; idx: number }) 
             )
           ) : (
             <>
-              <Image src={project.image} alt={project.imageAlt} fill sizes="(max-width: 768px) 100vw, 50vw" quality={75} className="work-mobile-image" priority={idx === 0} />
+              <Image src={project.image} alt={project.imageAlt} fill sizes="(max-width: 768px) 100vw, 50vw" quality={75} className="work-mobile-image" priority={idx <= 1} />
               <div className="work-mobile-image-overlay pointer-events-none" />
             </>
           )}

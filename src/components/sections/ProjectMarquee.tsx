@@ -1,8 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import { motion, useReducedMotion, useScroll, useTransform, type MotionValue } from "framer-motion";
-import { useRef, useState, useEffect } from "react";
+import { useRef } from "react";
 
 interface Project {
   name: string;
@@ -13,17 +12,17 @@ interface Project {
 
 const PROJECTS: Project[] = [
   // ROW 1
-  { name: "Space Voyage", category: "Web3 Platform", year: "2024", image: "https://motionsites.ai/assets/hero-space-voyage-preview-eECLH3Yc.gif" },
-  { name: "CodeNest", category: "Dev Tools", year: "2024", image: "https://motionsites.ai/assets/hero-codenest-preview-Cgppc2qV.gif" },
-  { name: "Vex Ventures", category: "Venture Capital", year: "2024", image: "https://motionsites.ai/assets/hero-vex-ventures-preview-BczMFIiw.gif" },
-  { name: "Stellar AI v2", category: "Generative AI", year: "2024", image: "https://motionsites.ai/assets/hero-stellar-ai-v2-preview-DjvxjG3C.gif" },
-  { name: "ASME Engineering", category: "Enterprise Web", year: "2023", image: "https://motionsites.ai/assets/hero-asme-preview-B_nGDnTP.gif" },
+  { name: "Space Voyage", category: "Web3 Platform", year: "2024", image: "hero-space-voyage-preview-eECLH3Yc" },
+  { name: "CodeNest", category: "Dev Tools", year: "2024", image: "hero-codenest-preview-Cgppc2qV" },
+  { name: "Vex Ventures", category: "Venture Capital", year: "2024", image: "hero-vex-ventures-preview-BczMFIiw" },
+  { name: "Stellar AI v2", category: "Generative AI", year: "2024", image: "hero-stellar-ai-v2-preview-DjvxjG3C" },
+  { name: "ASME Engineering", category: "Enterprise Web", year: "2023", image: "hero-asme-preview-B_nGDnTP" },
   // ROW 2
-  { name: "DesignPro", category: "Creative Agency", year: "2023", image: "https://motionsites.ai/assets/hero-designpro-preview-D8c5_een.gif" },
-  { name: "Stellar AI", category: "MLops Dashboard", year: "2023", image: "https://motionsites.ai/assets/hero-stellar-ai-preview-D3HL6bw1.gif" },
-  { name: "XPortfolio", category: "Creator Portfolio", year: "2024", image: "https://motionsites.ai/assets/hero-xportfolio-preview-D4A8maiC.gif" },
-  { name: "Orbit Web3", category: "DeFi Protocol", year: "2024", image: "https://motionsites.ai/assets/hero-orbit-web3-preview-BXt4OttD.gif" },
-  { name: "Nexora Cloud", category: "Cloud Security", year: "2024", image: "https://motionsites.ai/assets/hero-nexora-preview-cx5HmUgo.gif" },
+  { name: "DesignPro", category: "Creative Agency", year: "2023", image: "hero-designpro-preview-D8c5_een" },
+  { name: "Stellar AI", category: "MLops Dashboard", year: "2023", image: "hero-stellar-ai-preview-D3HL6bw1" },
+  { name: "XPortfolio", category: "Creator Portfolio", year: "2024", image: "hero-xportfolio-preview-D4A8maiC" },
+  { name: "Orbit Web3", category: "DeFi Protocol", year: "2024", image: "hero-orbit-web3-preview-BXt4OttD" },
+  { name: "Nexora Cloud", category: "Cloud Security", year: "2024", image: "hero-nexora-preview-cx5HmUgo" },
 ];
 
 const ROW_ONE = PROJECTS.slice(0, 5);
@@ -31,8 +30,9 @@ const ROW_TWO = PROJECTS.slice(5);
 
 function MarqueeTile({ project }: { project: Project }) {
   const cardRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Use direct DOM mutation for mouse spotlight — avoids React state update on every mousemove
+  // Direct DOM mutation for mouse spotlight — zero re-renders
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const card = cardRef.current;
     if (!card) return;
@@ -41,20 +41,60 @@ function MarqueeTile({ project }: { project: Project }) {
     card.style.setProperty("--tile-mouse-y", `${e.clientY - rect.top}px`);
   };
 
-  // Derive local MP4 path — GIFs decode on CPU, MP4 decodes on GPU
-  const filename = project.image.split('/').pop()?.replace('.gif', '.mp4');
-  const videoSrc = `/videos/${filename}`;
+  // Hover-to-play — set src + play only for THIS card (max 1 GPU decoder)
+  const handleMouseEnter = () => {
+    const vid = videoRef.current;
+    if (!vid) return;
+    vid.src = videoSrc;
+    vid.play().catch(() => {});
+  };
+
+  // Pause + fully release — removes src to free all browser resources
+  const handleMouseLeave = () => {
+    const vid = videoRef.current;
+    if (!vid) return;
+    vid.pause();
+    vid.removeAttribute("src");
+    vid.load();
+  };
+
+  // Local asset paths — image field is the basename
+  const videoSrc  = `/videos/${project.image}.mp4`;
+  const posterSrc = `/images/posters/${project.image}.webp`;
 
   return (
     <div
       ref={cardRef}
       className="project-marquee-card group relative h-[190px] w-[296px] shrink-0 overflow-hidden sm:h-[220px] sm:w-[340px] lg:h-[270px] lg:w-[420px]"
       onMouseMove={handleMouseMove}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
-      {/* Decorative gradient mask overlays */}
+      {/* ── Layer 1: WebP poster + Ken Burns — always visible, feels alive ── */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={posterSrc}
+        alt={project.name}
+        className="absolute inset-0 h-full w-full object-cover project-marquee-ken-burns"
+        loading="lazy"
+        decoding="async"
+      />
+
+      {/* ── Layer 2: MP4 video — no src at idle, set only on hover (zero overhead) ── */}
+      <video
+        ref={videoRef}
+        poster={posterSrc}
+        loop
+        muted
+        playsInline
+        preload="none"
+        className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-500 ease-out group-hover:opacity-100"
+      />
+
+      {/* ── Layer 3: Decorative gradient overlay ── */}
       <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-[#07090f]/50 via-transparent to-white/4" />
-      
-      {/* Hover info overlay */}
+
+      {/* ── Layer 4: Hover info overlay ── */}
       <div className="project-marquee-overlay">
         <h4 className="project-marquee-title">{project.name}</h4>
         <div className="project-marquee-meta">
@@ -62,15 +102,6 @@ function MarqueeTile({ project }: { project: Project }) {
           <span className="project-marquee-year">{project.year}</span>
         </div>
       </div>
-
-      <video
-        src={videoSrc}
-        loop
-        muted
-        playsInline
-        preload="none"
-        className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
-      />
     </div>
   );
 }
@@ -107,25 +138,6 @@ export function ProjectMarquee() {
   const rowOneX = useTransform(scrollYProgress, [0, 1], prefersReducedMotion ? [0, 0] : [-220, 420]);
   const rowTwoX = useTransform(scrollYProgress, [0, 1], prefersReducedMotion ? [0, 0] : [220, -420]);
 
-  // Master observer for all videos
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        const videos = el.querySelectorAll("video");
-        if (entry.isIntersecting) {
-          videos.forEach((v) => v.play().catch(() => {}));
-        } else {
-          videos.forEach((v) => v.pause());
-        }
-      },
-      { rootMargin: "200px" }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
 
   return (
     <div
