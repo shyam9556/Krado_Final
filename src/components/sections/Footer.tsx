@@ -1,5 +1,7 @@
 "use client";
 
+import "@/styles/footer.css";
+
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUp, Send, Check } from "lucide-react";
@@ -33,10 +35,9 @@ export function Footer() {
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         <div className="scanline-grid opacity-[0.02] absolute inset-0" />
         <div 
-          className="absolute right-[-10rem] bottom-[-10rem] h-[500px] w-[500px] rounded-full opacity-[0.04] dark:opacity-[0.06]"
+          className="absolute right-[-10rem] bottom-[-10rem] h-[500px] w-[500px] rounded-full"
           style={{
-            background: "radial-gradient(circle, var(--accent-primary) 0%, transparent 70%)",
-            filter: "blur(90px)"
+            background: "radial-gradient(circle, rgba(255,85,0,0.04) 0%, transparent 88%)",
           }}
         />
       </div>

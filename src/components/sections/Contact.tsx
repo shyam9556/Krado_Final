@@ -1,5 +1,7 @@
 "use client";
 
+import "@/styles/contact.css";
+
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, ArrowRight } from "lucide-react";
@@ -71,17 +73,15 @@ export function Contact() {
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         <div className="scanline-grid opacity-[0.02] absolute inset-0" />
         <div
-          className="absolute left-[-15rem] top-[-10rem] h-[600px] w-[600px] rounded-full opacity-[0.03] dark:opacity-[0.05]"
+          className="absolute left-[-15rem] top-[-10rem] h-[600px] w-[600px] rounded-full"
           style={{
-            background: "radial-gradient(circle, var(--accent-primary) 0%, transparent 68%)",
-            filter: "blur(110px)",
+            background: "radial-gradient(circle, rgba(255,85,0,0.04) 0%, transparent 90%)",
           }}
         />
         <div
-          className="absolute right-[-10rem] top-1/2 h-[500px] w-[500px] rounded-full opacity-[0.02]"
+          className="absolute right-[-10rem] top-1/2 h-[500px] w-[500px] rounded-full"
           style={{
-            background: "radial-gradient(circle, #22d3ee 0%, transparent 68%)",
-            filter: "blur(90px)",
+            background: "radial-gradient(circle, rgba(34,211,238,0.015) 0%, transparent 88%)",
           }}
         />
       </div>

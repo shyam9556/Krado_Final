@@ -1,0 +1,456 @@
+﻿/* ============================================================
+   CONTACT / START A PROJECT SECTION
+   ============================================================ */
+.contact-section {
+  position: relative;
+  background-color: #050508;
+  overflow: hidden;
+  padding: 6rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+@media (min-width: 1024px) {
+  .contact-section {
+    padding: 10rem 0 8rem;
+  }
+}
+
+.contact-container {
+  width: 100%;
+  max-width: 80rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .contact-container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .contact-container {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+  }
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 4rem;
+}
+
+@media (min-width: 1024px) {
+  .contact-grid {
+    grid-template-columns: repeat(12, 1fr);
+    gap: 5rem;
+    align-items: start;
+  }
+}
+
+/* Info Panel (Left) */
+.contact-info-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 1024px) {
+  .contact-info-panel {
+    grid-column: span 5;
+  }
+}
+
+.contact-tag {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: #a6b0bc;
+  margin-bottom: 1.5rem;
+}
+
+.contact-title-display {
+  font-family: var(--font-heading);
+  font-size: clamp(2.5rem, 5vw, 4.25rem);
+  font-weight: 900;
+  line-height: 0.95;
+  text-transform: uppercase;
+  letter-spacing: -0.04em;
+  color: #fff;
+  margin-bottom: 2rem;
+}
+
+.contact-desc {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 3.5rem;
+  max-width: 28rem;
+}
+
+.contact-meta-zone {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 2.5rem;
+}
+
+.contact-clock-widget {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.contact-clock-label,
+.contact-direct-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  color: rgba(255, 255, 255, 0.35);
+  text-transform: uppercase;
+}
+
+.contact-clock-time {
+  font-family: var(--font-mono);
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #fff;
+  letter-spacing: -0.02em;
+}
+
+.contact-direct-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.contact-email-link {
+  font-family: var(--font-heading);
+  font-size: 1.75rem;
+  font-weight: 500;
+  color: #fff;
+  letter-spacing: -0.02em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  width: fit-content;
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.contact-email-link::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: var(--accent-primary);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.contact-email-link:hover {
+  color: var(--accent-primary);
+}
+
+.contact-email-link:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.contact-email-arrow {
+  font-family: sans-serif;
+  font-size: 1.5rem;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.contact-email-link:hover .contact-email-arrow {
+  transform: translateX(6px);
+}
+
+/* Form Panel (Right) */
+.contact-form-panel {
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .contact-form-panel {
+    grid-column: span 7;
+  }
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-group-title {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #fff;
+  letter-spacing: -0.01em;
+}
+
+/* Services Selection Chips */
+.form-services-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.form-service-chip,
+.form-budget-chip {
+  position: relative;
+  padding: 0.625rem 1.25rem;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.6);
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: color 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+}
+
+.form-service-chip__glow,
+.form-budget-chip__glow {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(255, 85, 0, 0.08) 0%, transparent 80%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+}
+
+.form-service-chip:hover,
+.form-budget-chip:hover {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.form-service-chip.is-selected,
+.form-budget-chip.is-selected {
+  color: var(--accent-primary);
+  border-color: rgba(255, 85, 0, 0.35);
+  background-color: rgba(255, 85, 0, 0.03);
+  box-shadow: 0 0 15px rgba(255, 85, 0, 0.02);
+  transform: scale(1.02);
+}
+
+.form-service-chip.is-selected .form-service-chip__glow,
+.form-budget-chip.is-selected .form-budget-chip__glow {
+  opacity: 1;
+}
+
+/* Budget Selector Row */
+.form-budget-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+/* Inputs wrapper & labels styling */
+.form-inputs-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 2.25rem;
+}
+
+.form-input-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding-top: 1.25rem;
+}
+
+.form-input-label {
+  position: absolute;
+  top: 1.75rem;
+  left: 0;
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.4);
+  pointer-events: none;
+  transform-origin: left top;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), color 0.3s ease;
+}
+
+.form-input-wrapper.is-active .form-input-label {
+  transform: translateY(-1.75rem) scale(0.8);
+  color: var(--accent-primary);
+}
+
+.form-text-input,
+.form-text-area {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.5rem 0;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  color: #fff;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.form-text-area {
+  resize: none;
+}
+
+.form-input-border-line {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: var(--accent-primary);
+  transform: scaleX(0);
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 5;
+}
+
+.form-input-wrapper.is-active .form-input-border-line {
+  transform: scaleX(1);
+}
+
+/* Form submission button & spinner */
+.form-submit-row {
+  display: flex;
+}
+
+.form-submit-btn {
+  position: relative;
+  width: 100%;
+  max-width: 16rem;
+  padding: 1rem 2rem;
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #000;
+  background-color: #fff;
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease, color 0.3s ease;
+}
+
+.form-submit-btn__sweep {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--accent-primary) 0%, #ff7700 100%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  z-index: 1;
+}
+
+.form-submit-btn:hover {
+  color: #fff;
+}
+
+.form-submit-btn:hover .form-submit-btn__sweep {
+  opacity: 1;
+}
+
+.form-submit-btn.is-success {
+  background-color: #22c55e !important;
+  color: #fff !important;
+}
+
+.form-submit-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-top-color: #000;
+  border-radius: 50%;
+  animation: spin-loader 0.8s infinite linear;
+}
+
+.form-submit-btn:hover .form-submit-spinner {
+  border-color: rgba(255, 255, 255, 0.2);
+  border-top-color: #fff;
+}
+
+.form-success-alert {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.25rem;
+}
+
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+   MOBILE PERFORMANCE: Disable hover effects on touch devices
+   @media (hover: none) matches phones & tablets accurately
+   Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
+@media (hover: none) and (pointer: coarse) {
+
+  /* ValueCard: disable hover styles Ã¢â‚¬â€ they trigger on first tap, look broken */
+  .about-value-card:hover,
+  .about-value-card.is-hovered {
+    border-color: rgba(255, 255, 255, 0.07);
+    background: linear-gradient(135deg, rgba(255,255,255,0.035) 0%, rgba(255,255,255,0.012) 100%);
+    box-shadow: none;
+    transform: none !important;
+  }
+
+  /* No shimmer sweep or cursor spotlight without a mouse */
+  .about-value-card::before,
+  .about-value-card__glow {
+    display: none;
+  }
+
+  /* Disable canvas Ã¢â‚¬â€ no mouse interactivity on touch, high CPU cost */
+  .about-manifesto-canvas {
+    display: none;
+  }
+
+  /* Floating tech icons in Work section Ã¢â‚¬â€ animated via GSAP, not useful on mobile */
+  .work-float-icon {
+    display: none;
+  }
+
+  /* Remove stat hover jank on tap */
+  .about-stat:hover {
+    transform: none;
+    background: none;
+  }
+  .about-stat:hover .about-stat__accent-dot {
+    opacity: 0.5;
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* Marquee items Ã¢â‚¬â€ no hover state on touch */
+  .about-marquee__item:hover {
+    color: var(--text-muted);
+    transform: none;
+    text-shadow: none;
+  }
+  .about-marquee__item:hover .about-marquee__dot {
+    opacity: 0.4;
+    transform: none;
+    text-shadow: none;
+  }
+}

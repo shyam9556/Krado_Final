@@ -1,5 +1,7 @@
 "use client";
 
+import "@/styles/testimonials.css";
+
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Quote, ArrowLeft, ArrowRight } from "lucide-react";
@@ -99,41 +101,43 @@ const TESTIMONIALS: Testimonial[] = [
 const CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+";
 
 function DecodeQuote({ text }: { text: string }) {
-  const [displayText, setDisplayText] = useState(text);
+  const spanRef = useRef<HTMLSpanElement>(null);
   const isAnimating = useRef(false);
 
   useEffect(() => {
     if (isAnimating.current) return;
     isAnimating.current = true;
-    
+
     let iterations = 0;
     const interval = setInterval(() => {
-      setDisplayText(() =>
-        text
-          .split("")
-          .map((letter, index) => {
-            if (index < iterations) {
-              return text[index];
-            }
-            if (letter === " ") return " ";
-            return CHARS[Math.floor(Math.random() * CHARS.length)];
-          })
-          .join("")
-      );
+      // Direct DOM mutation — zero React re-renders
+      const decoded = text
+        .split("")
+        .map((letter, index) => {
+          if (index < iterations) return text[index];
+          if (letter === " ") return " ";
+          return CHARS[Math.floor(Math.random() * CHARS.length)];
+        })
+        .join("");
+
+      if (spanRef.current) spanRef.current.textContent = decoded;
 
       if (iterations >= text.length) {
         clearInterval(interval);
         isAnimating.current = false;
-        setDisplayText(text); // Ensure it's perfectly set
+        if (spanRef.current) spanRef.current.textContent = text;
       }
 
-      iterations += 1; // Speed of decode
+      iterations += 1;
     }, 20);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      isAnimating.current = false;
+    };
   }, [text]);
 
-  return <span className="testimonials-quote-decode">{displayText}</span>;
+  return <span ref={spanRef} className="testimonials-quote-decode">{text}</span>;
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -145,20 +149,22 @@ export function Testimonials() {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+    const mq = window.matchMedia("(max-width: 767px)");
+    setIsMobile(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
   }, []);
 
-  // Autoplay functionality
+  // Autoplay — functional updater reads latest state from React internals,
+  // so no dependency on activeIndex needed. Timer created once, runs forever.
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveIndex((current) => (current + 1) % TESTIMONIALS.length);
-    }, 8000); // Swipe every 8 seconds
+    }, 8000);
     
     return () => clearInterval(interval);
-  }, [activeIndex]);
+  }, []);
 
   const handleNext = () => {
     setActiveIndex((current) => (current + 1) % TESTIMONIALS.length);
@@ -194,10 +200,10 @@ export function Testimonials() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 1.2 }}
               transition={{ duration: 1.5, ease: "easeInOut" }}
-              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] md:w-[800px] md:h-[800px] rounded-full blur-[100px] md:blur-[140px]"
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] md:w-[800px] md:h-[800px] rounded-full"
               style={{
-                background: `radial-gradient(circle, ${activeTestimonial.brandColor} 0%, transparent 60%)`,
-                opacity: 0.15
+                background: `radial-gradient(circle, ${activeTestimonial.brandColor} 0%, transparent 88%)`,
+                opacity: 0.08
               }}
             />
           </AnimatePresence>
@@ -209,7 +215,7 @@ export function Testimonials() {
         
         {/* Header & Main Quote Display */}
         <div className="flex flex-col items-center text-center w-full max-w-5xl mx-auto">
-          <span className="testimonials-tag mb-8 md:mb-12 inline-block px-4 py-1.5 rounded-full border border-border/50 text-xs font-mono text-muted-foreground uppercase tracking-widest bg-background/50 backdrop-blur-md">
+          <span className="testimonials-tag mb-8 md:mb-12 inline-block px-4 py-1.5 rounded-full border border-border/50 text-xs font-mono text-muted-foreground uppercase tracking-widest bg-background/80">
             05 — Success Stories
           </span>
           
@@ -278,14 +284,14 @@ export function Testimonials() {
                     relative border border-white/10 rounded-2xl p-6 md:p-8 
                     w-[280px] md:w-[380px] h-[320px] md:h-[340px] flex flex-col justify-between overflow-hidden
                     transition-shadow duration-500
-                    ${isMobile ? 'bg-[#0b0c10]' : 'bg-[#0b0c10]/80 backdrop-blur-xl'}
+                    bg-[#0b0c10]
                     ${isCenter ? 'shadow-[0_20px_50px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.1)] border-white/20' : 'shadow-none'}
                   `}>
                     {/* Inner Top Accent Glow - Hidden on mobile to save GPU frame rate */}
                     {!isMobile && (
                       <div 
-                        className="absolute -top-24 left-1/2 -translate-x-1/2 w-[200px] h-[200px] rounded-full blur-[60px] pointer-events-none opacity-50"
-                        style={{ background: testimonial.brandColor }}
+                        className="absolute -top-32 left-1/2 -translate-x-1/2 w-[280px] h-[280px] rounded-full pointer-events-none"
+                        style={{ background: testimonial.brandColor, opacity: 0.18 }}
                       />
                     )}
 
@@ -293,7 +299,7 @@ export function Testimonials() {
                       <div className="flex items-center gap-3 mb-6">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
-                          src={`https://cdn.simpleicons.org/${testimonial.logo}/ffffff`}
+                          src={`/icons/${testimonial.logo}.svg`}
                           alt={`${testimonial.company} Logo`}
                           className="w-8 h-8 md:w-10 md:h-10 filter invert dark:invert-0 drop-shadow-md"
                           onError={(e) => {

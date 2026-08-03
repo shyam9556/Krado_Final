@@ -1,0 +1,1051 @@
+/* ============================================================
+   WORK SECTION Ã¢â‚¬â€ Horizontal scroll gallery  04 Ã¢â‚¬â€ SELECTED WORK
+   ============================================================ */
+
+/* Ã¢â€â‚¬Ã¢â€â‚¬ Noise grain SVG data URI (used via pseudo-element) Ã¢â€â‚¬Ã¢â€â‚¬ */
+/* ——— Noise grain SVG data URI (used via pseudo-element) ——— */
+@property --grain-opacity {
+  syntax: "<number>";
+  initial-value: 0.035;
+  inherits: false;
+}
+
+/* ——— Section shell ——— */
+.work-section {
+  position: relative;
+  /* No overflow:hidden here — GSAP pin needs the element in flow.
+     Clipping is on .work-track-overflow instead. */
+  background: var(--background);
+  min-height: 100vh;
+}
+
+/* ——— Section label pin (stays fixed in viewport corner while pinned) ——— */
+.work-section-label {
+  position: absolute;
+  top: 2rem;
+  left: clamp(1.5rem, 5vw, 4rem);
+  z-index: 30;
+  pointer-events: none;
+}
+
+.work-section-tag {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  color: #FF5500;
+  text-transform: uppercase;
+}
+
+/* ——— Custom cursor blob ——— */
+
+/* ——— Overflow container (clips horizontal track) ——— */
+.work-track-overflow {
+  width: 100vw;        /* exact viewport — no wider */
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ——— Track: flex row; panels animated individually by GSAP (not this container) ——— */
+.work-track {
+  display: flex;
+  flex-wrap: nowrap;    /* keep all panels in a single row */
+  /* Do NOT set width here — let it be auto so panels lay out naturally */
+  height: 100vh;
+  /* NO will-change here — GSAP applies it per panel */
+}
+
+/* ——— Single panel base ———
+   Each panel is exactly 100vw wide and sits in the flex row.
+   GSAP animates xPercent on ALL panels simultaneously;
+   at each snap point exactly one panel occupies x=0 (visible). ——— */
+.work-panel {
+  position: relative;
+  display: grid;
+  grid-template-columns: 55fr 45fr;
+  align-items: center;
+  width: 100vw;
+  min-width: 100vw;     /* belt-and-suspenders: never compress */
+  height: 100vh;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+/* ════════════════════════════════════════════════════════════ 
+   LAPTOP FRAME SCROLL ANIMATION
+   ════════════════════════════════════════════════════════════ */
+.work-laptop-screen {
+  container-type: size;
+  container-name: laptopscreen;
+}
+
+@keyframes laptop-website-scroll {
+  0%, 10% { transform: translateY(0); }
+  45%, 55% { transform: translateY(calc(-100% + 100cqh)); }
+  90%, 100% { transform: translateY(0); }
+}
+
+.animate-website-scroll {
+  animation: laptop-website-scroll 24s ease-in-out infinite;
+}
+
+/* Ã¢â€â‚¬Ã¢â€â‚¬ Ghost index number (behind everything) Ã¢â€â‚¬Ã¢â€â‚¬ */
+.work-ghost-index {
+  position: absolute;
+  bottom: -0.15em;
+  right: -0.05em;
+  font-family: var(--font-heading);
+  font-size: clamp(16rem, 30vw, 28rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.06em;
+  color: rgba(255, 255, 255, 0.028);
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+  white-space: nowrap;
+}
+
+/* Ã¢â€â‚¬Ã¢â€â‚¬ Image side Ã¢â€â‚¬Ã¢â€â‚¬ */
+.work-panel-image-wrap {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+}
+
+@keyframes auto-scroll-tour {
+  0% { object-position: 50% 0%; }
+  10% { object-position: 50% 0%; }
+  45% { object-position: 50% 100%; }
+  55% { object-position: 50% 100%; }
+  90% { object-position: 50% 0%; }
+  100% { object-position: 50% 0%; }
+}
+
+.animate-video-tour {
+  animation: auto-scroll-tour 24s ease-in-out infinite;
+}
+
+.work-panel-image {
+  object-fit: cover;
+  object-position: center;
+  /* default state Ã¢â‚¬â€ GSAP overrides per-panel */
+  transform: scale(0.9);
+  filter: saturate(0.2) brightness(0.5);
+  transition: none;
+}
+
+/* Gradient blend from image into dark background */
+.work-panel-image-fade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 45%,
+    var(--background) 97%
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Noise grain overlay on image */
+.work-panel-grain {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0.06;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+}
+
+/* Ã¢â€â‚¬Ã¢â€â‚¬ Content side Ã¢â€â‚¬Ã¢â€â‚¬ */
+.work-panel-content {
+  position: relative;
+  z-index: 5;
+  padding: clamp(2.5rem, 5vw, 5rem) clamp(2rem, 4vw, 4rem);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  /* 3D tilt via GSAP mousemove */
+  backface-visibility: hidden;
+}
+
+.work-panel-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.work-panel-category {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: #FF5500;
+  text-transform: uppercase;
+}
+
+.work-panel-dot {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.work-panel-year {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+}
+
+.work-panel-index-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+.work-panel-name {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 3.5vw, 4.5rem); /* Reduced significantly to fit RENEWABLE in one line */
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 0.88;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  margin: 0 0 1.25rem;
+  white-space: nowrap; /* Prevents inline-block letters from breaking */
+}
+
+/* Hairline rule Ã¢â‚¬â€ GSAP scaleX 0Ã¢â€ â€™1 on activation */
+.work-panel-rule {
+  width: 3rem;
+  height: 1px;
+  background: linear-gradient(90deg, #FF5500, #FF8800);
+  margin-bottom: 1.25rem;
+  transform-origin: left center;
+  transform: scaleX(0);           /* GSAP animates to scaleX(1) */
+  border-radius: 1px;
+  box-shadow: 0 0 6px rgba(255, 85, 0, 0.4);
+}
+
+.work-panel-desc {
+  font-family: var(--font-sans);
+  font-size: clamp(0.875rem, 1.3vw, 1rem);
+  line-height: 1.65;
+  color: var(--text-secondary);
+  max-width: 34ch;
+  margin: 0 0 1.75rem;
+}
+
+/* Ã¢â€â‚¬Ã¢â€â‚¬ Tech tag chips Ã¢â€â‚¬Ã¢â€â‚¬ */
+.work-panel-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.work-tag-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  background: transparent;
+  cursor: default;
+  /* GSAP manages color/border; CSS handles hover scale */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  z-index: 1; /* Explicit base z-index */
+}
+
+.work-tag-icon {
+  display: block;
+  width: 24px;
+  height: 24px;
+  background-color: currentColor; /* Inherits color from GSAP on the parent chip */
+  mask-size: contain;
+  mask-position: center;
+  mask-repeat: no-repeat;
+}
+
+/* Hover effect on active tag (when it already has orange from GSAP) */
+.is-active .work-tag-chip:hover {
+  transform: scale(1.12) translateY(-1px) translateZ(10px);
+  box-shadow: 0 0 14px rgba(255, 85, 0, 0.35);
+  cursor: pointer;
+  z-index: 100 !important; /* Force to front */
+}
+
+/* Ã¢â€â‚¬Ã¢â€â‚¬ Progress bar Ã¢â€â‚¬Ã¢â€â‚¬ */
+.work-progress-track {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.07);
+  z-index: 40;
+}
+
+.work-progress-fill {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #FF5500, #FF8800);
+  transform-origin: left center;
+  transform: scaleX(0);
+}
+
+/* Subtle glow on fill */
+.work-progress-fill::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #FF5500;
+  box-shadow: 0 0 12px 4px rgba(255, 85, 0, 0.6);
+}
+
+/* Ã¢â€â‚¬Ã¢â€â‚¬ Panel indicator dots (bottom-centre) Ã¢â€â‚¬Ã¢â€â‚¬ */
+/* Ã¢â€â‚¬Ã¢â€â‚¬ Vertical dot-rail (left side) Ã¢â‚¬â€ replaces old bottom-centre dots Ã¢â€â‚¬Ã¢â€â‚¬
+   Positioned mid-left to avoid collisions with cursor, progress bar,
+   and the chapter counter in the bottom corners. */
+.work-dot-rail {
+  position: absolute;
+  left: clamp(1.25rem, 3vw, 2.5rem);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+.work-dot-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  /* Increase hit area without changing visible size */
+}
+
+.work-dot-btn:focus-visible .work-dot-inner {
+  box-shadow: 0 0 0 2px #FF5500;
+}
+
+.work-dot-inner {
+  display: block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  transition: background 0.35s ease, transform 0.35s ease,
+              height 0.35s ease, border-radius 0.35s ease;
+}
+
+.work-dot-btn.active .work-dot-inner {
+  background: #FF5500;
+  height: 22px;
+  border-radius: 3px;
+  box-shadow: 0 0 10px rgba(255, 85, 0, 0.5);
+}
+
+.work-dot-btn:hover .work-dot-inner {
+  background: rgba(255, 255, 255, 0.5);
+  transform: scale(1.3);
+}
+.work-dot-btn.active:hover .work-dot-inner {
+  background: #FF5500;
+}
+
+
+/* Ã¢â€â‚¬Ã¢â€â‚¬ Chapter counter (bottom-right) Ã¢â€â‚¬Ã¢â€â‚¬ */
+.work-chapter-counter {
+  position: absolute;
+  bottom: 2rem;
+  right: clamp(1.5rem, 5vw, 4rem);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+
+.work-chapter-current {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #FF5500;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  transition: opacity 0.15s ease;
+}
+
+.work-chapter-sep {
+  display: block;
+  width: 24px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.work-chapter-total {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+   CLOSING PANEL
+   Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
+.work-closing-panel {
+  /* Override the project panel grid with flex centering */
+  display: flex !important;
+  grid-template-columns: none;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--background);
+}
+
+/* Pulsing concentric rings */
+.work-closing-rings {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.work-closing-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 85, 0, 0.1);
+}
+
+.ring-1 {
+  width: 38vw;
+  height: 38vw;
+  max-width: 560px;
+  max-height: 560px;
+  animation: ring-pulse 3.6s ease-in-out infinite;
+}
+.ring-2 {
+  width: 58vw;
+  height: 58vw;
+  max-width: 860px;
+  max-height: 860px;
+  border-color: rgba(255, 85, 0, 0.06);
+  animation: ring-pulse 3.6s ease-in-out infinite 0.75s;
+}
+.ring-3 {
+  width: 78vw;
+  height: 78vw;
+  max-width: 1160px;
+  max-height: 1160px;
+  border-color: rgba(255, 85, 0, 0.03);
+  animation: ring-pulse 3.6s ease-in-out infinite 1.5s;
+}
+
+@keyframes ring-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%       { transform: scale(1.05); opacity: 0.5; }
+}
+
+.work-closing-content {
+  position: relative;
+  z-index: 5;
+  text-align: center;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.75rem;
+}
+
+.work-closing-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.28em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.work-closing-headline {
+  font-family: var(--font-heading);
+  font-size: clamp(3.5rem, 9vw, 8rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 0.88;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* CTA link with animated fill */
+.work-closing-link {
+  display: inline-flex;
+  text-decoration: none;
+  border-radius: 999px;
+  overflow: hidden; /* Contains the ::before fill */
+  box-shadow: inset 0 0 0 1px rgba(255, 85, 0, 0.5); /* Replaces border to avoid anti-aliasing slivers */
+  position: relative;
+  transition: box-shadow 0.38s ease;
+}
+
+.work-closing-link:hover {
+  box-shadow: inset 0 0 0 1px #FF5500, 0 0 28px rgba(255, 85, 0, 0.25);
+}
+
+.work-closing-link::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #FF5500;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.38s cubic-bezier(0.76, 0, 0.24, 1);
+  z-index: 0;
+}
+
+.work-closing-link:hover::before {
+  transform: scaleX(1);
+}
+
+.work-closing-link-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.9rem 2.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: #FF5500;
+  text-transform: uppercase;
+  position: relative;
+  z-index: 1; /* Sits above the ::before fill */
+  transition: color 0.38s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.work-closing-link-inner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #FF5500;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.38s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.work-closing-link:hover .work-closing-link-inner {
+  color: #fff;
+}
+
+.work-closing-link:hover .work-closing-link-inner::before {
+  transform: scaleX(1);
+}
+
+.work-closing-link-inner > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Arrow nudge */
+.work-closing-link span:last-child {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.work-closing-link:hover span:last-child {
+  transform: translateX(4px);
+}
+
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+   MOBILE Ã¢â‚¬â€ vertical stack
+   Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
+
+.work-mobile-stack {
+  padding: 5.5rem clamp(1.25rem, 5vw, 2.5rem) 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.work-mobile-header {
+  text-align: left;
+}
+
+.work-mobile-section-title {
+  font-family: var(--font-heading);
+  font-size: clamp(2.25rem, 9vw, 3.75rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  margin: 0;
+  line-height: 1;
+}
+
+.work-mobile-card {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--card);
+  border: 1px solid var(--border);
+  perspective: 1000px;
+}
+
+.work-mobile-ghost-index {
+  position: absolute;
+  top: -0.75rem;
+  right: -0.25rem;
+  font-family: var(--font-heading);
+  font-size: clamp(6rem, 22vw, 10rem);
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.04);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+  z-index: 1;
+}
+
+.work-mobile-image-wrap {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+}
+
+.work-mobile-image {
+  object-fit: cover;
+  transition: transform 0.7s ease;
+}
+
+.work-mobile-card:hover .work-mobile-image {
+  transform: scale(1.04);
+}
+
+.work-mobile-image-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 30%, var(--card) 100%);
+}
+
+.work-mobile-content {
+  position: relative;
+  z-index: 2;
+  padding: 1.25rem 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.work-mobile-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.work-mobile-category {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: #FF5500;
+  text-transform: uppercase;
+}
+
+.work-mobile-year {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.work-mobile-name {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 7.5vw, 2.75rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  margin: 0;
+  line-height: 1;
+}
+
+.work-mobile-desc {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.work-mobile-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.25rem;
+}
+
+/* Mobile closing card */
+.work-mobile-closing {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  background: var(--card);
+  position: relative;
+  overflow: hidden;
+}
+
+.work-mobile-closing-headline {
+  font-family: var(--font-heading);
+  font-size: clamp(1.75rem, 7vw, 2.5rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+   3D LETTER HOVER Ã¢â‚¬â€ project name split into individual spans
+   Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
+
+/* Perspective container on the heading */
+.work-panel-name--split {
+  perspective: 600px;
+  display: block;
+  white-space: nowrap;
+  cursor: default;
+}
+
+.work-name-letter {
+  display: inline-block;
+  transition:
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    color 0.25s ease,
+    text-shadow 0.25s ease;
+  transform-origin: bottom center;
+  /* Stagger delay via CSS custom property */
+  transition-delay: calc(var(--i, 0) * 0.03s);
+}
+
+/* On active panel hover Ã¢â‚¬â€ lift each letter with 3D flip */
+.is-active .work-panel-name--split:hover .work-name-letter {
+  transform: translateY(-6px) rotateX(18deg) scale(1.04);
+  color: #FF5500;
+  text-shadow: 0 8px 24px rgba(255, 85, 0, 0.4);
+  transition-delay: calc(var(--i, 0) * 0.025s);
+}
+
+/* Individual letter hover Ã¢â‚¬â€ stronger effect */
+.is-active .work-name-letter:hover {
+  transform: translateY(-10px) rotateX(25deg) scale(1.08) !important;
+  color: #FF7733 !important;
+  text-shadow: 0 12px 32px rgba(255, 85, 0, 0.55) !important;
+  transition-delay: 0s !important;
+}
+
+
+
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+   SR-ONLY UTILITY (if not already defined globally)
+   Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+   REDUCED MOTION
+   Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
+@media (prefers-reduced-motion: reduce) {
+  .work-panel-image {
+    filter: none !important;
+    transform: none !important;
+  }
+  .work-tag-chip {
+    color: rgba(255, 255, 255, 0.6) !important;
+  }
+  .work-closing-ring {
+    animation: none !important;
+  }
+  .work-name-letter {
+    transition: none !important;
+    transform: none !important;
+  }
+  .work-tag-inner {
+    transition: none !important;
+  }
+  .work-dot-inner {
+    transition: none !important;
+  }
+}
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+   FLOATING TECH ICONS Ã¢â‚¬â€ inside .work-panel-image-wrap
+   Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
+.work-floating-icons {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0; /* behind content */
+}
+
+.work-float-icon {
+  position: absolute;
+  /* GSAP handles x/y translation on this outer container */
+  /* drop-shadow removed — at 0.18 opacity on dark bg the glow
+     was invisible but cost a GPU filter layer per icon (12 total). */
+  opacity: 0.18;
+  transition: opacity 0.5s ease;
+  z-index: 0;
+}
+
+.work-float-icon-inner {
+  /* CSS vars injected via inline style */
+  animation: fi-float var(--fi-dur, 4s) ease-in-out infinite alternate;
+  animation-delay: var(--fi-delay, 0s);
+}
+
+/* When the panel is active, icons become more visible */
+.is-active .work-float-icon {
+  opacity: 0.35;
+}
+
+.work-float-icon-inner img {
+  display: block;
+  filter: brightness(0) invert(1); /* white icons */
+}
+
+@keyframes fi-float {
+  0%   { transform: translateY(0px)  rotate(-3deg) scale(1);    }
+  100% { transform: translateY(-18px) rotate(3deg) scale(1.08); }
+}
+
+/* ── Pause ALL infinite CSS animations on non-visible panels ──
+   The horizontal scroll gallery shows 1 panel at a time.
+   React already toggles .is-active on the visible panel.
+   These rules freeze the other 4 panels' animations — saving
+   ~25 GPU operations that nobody can see. */
+
+/* Float icon bob — only animate on the visible panel */
+.work-panel:not(.is-active) .work-float-icon-inner {
+  animation-play-state: paused;
+}
+
+/* Laptop website scroll — only animate on the visible panel */
+.work-panel:not(.is-active) .animate-website-scroll {
+  animation-play-state: paused;
+}
+
+/* Ring pulse — only animate when closing panel is active */
+.work-panel:not(.is-active) .work-closing-ring {
+  animation-play-state: paused;
+}
+
+/* Live Tour pulse dot — only animate on active panel */
+.work-panel:not(.is-active) .animate-pulse {
+  animation-play-state: paused;
+}
+
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+   PANEL MOUSE GLOW Ã¢â‚¬â€ dynamic spotlight
+   Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
+.work-panel-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 60vw;
+  height: 60vw;
+  max-width: 800px;
+  max-height: 800px;
+  translate: -50% -50%;
+  background: radial-gradient(circle closest-side, rgba(255, 85, 0, 0.08), transparent 100%);
+  pointer-events: none;
+  z-index: 1; /* Above mesh, behind content */
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+.is-active .work-panel-glow {
+  opacity: 1;
+}
+
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+   3D PERSPECTIVE MESH BACKGROUND
+   Positioned absolute, behind image+content.
+   GSAP applies rotateX/rotateY on mousemove for 3D tilt.
+   Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
+.work-panel-mesh {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  /* Perspective grid lines - base faint layer */
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 64px 64px;
+  /* Radial fade so grid disappears toward edges */
+  -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 80%);
+          mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 80%);
+  /* 3D perspective Ã¢â‚¬â€ GSAP will rotate this */
+  transform-style: preserve-3d;
+}
+
+/* Ã¢â€â‚¬Ã¢â€â‚¬ Active Glow Grid that follows the mouse Ã¢â€â‚¬Ã¢â€â‚¬ */
+.work-panel-mesh::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* Bright orange grid */
+  background-image:
+    linear-gradient(rgba(255, 85, 0, 0.4) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 85, 0, 0.4) 1px, transparent 1px);
+  background-size: 64px 64px;
+  /* Mask it heavily around the mouse coordinates */
+  -webkit-mask-image: radial-gradient(circle 350px at var(--mouse-x, 50%) var(--mouse-y, 50%), black 0%, transparent 100%);
+          mask-image: radial-gradient(circle 350px at var(--mouse-x, 50%) var(--mouse-y, 50%), black 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: 1;
+}
+
+.is-active .work-panel-mesh::before {
+  opacity: 1;
+}
+
+/* Orange centre glow orb behind the mesh */
+.work-panel-mesh::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 45% 45% at 50% 50%,
+    rgba(255, 85, 0, 0.06) 0%,
+    transparent 70%
+  );
+}
+
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+   TAG TOOLTIP Ã¢â‚¬â€ icon + label, slides up on chip hover
+   Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
+.work-tag-chip {
+  position: relative; /* Ensure tooltip is positioned relative to chip */
+}
+
+.work-tag-tooltip {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
+  background: rgba(8, 8, 8, 0.95);
+  border: 1px solid rgba(255, 85, 0, 0.4);
+  border-radius: 8px;
+  padding: 5px 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), visibility 0s linear 0.22s;
+  white-space: nowrap;
+  z-index: 200;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255,85,0,0.1);
+}
+
+/* Tiny arrow pointing down */
+.work-tag-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: rgba(255, 85, 0, 0.4);
+  pointer-events: none;
+}
+
+.work-tag-tooltip img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+.work-tag-tooltip span {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.85);
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+/* Only show tooltip when the panel is active AND chip is hovered */
+.is-active .work-tag-chip:hover .work-tag-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+  transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), visibility 0s linear 0s;
+}
+
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+   REDUCED MOTION Ã¢â‚¬â€ disable new animations
+   Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
+@media (prefers-reduced-motion: reduce) {
+  .work-float-icon {
+    animation: none;
+    opacity: 0.25;
+  }
+  .work-panel-mesh {
+    transform: none !important;
+  }
+  .work-tag-tooltip {
+    transition: opacity 0.1s ease;
+  }
+}
+
+/* end work section */

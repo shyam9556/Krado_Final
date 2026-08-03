@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import { motion, useReducedMotion, useScroll, useTransform, useSpring, Variants } from "framer-motion";
+import "@/styles/hero.css";
+
+import { useEffect, useState, useRef, useCallback } from "react";
+import { motion, useReducedMotion, Variants } from "framer-motion";
 import { useLenis } from "@/components/layout/smooth-scroll-provider";
 import { useIntroState } from "@/components/layout/intro-state-provider";
 import { Magnetic } from "@/components/ui/Magnetic";
@@ -14,38 +16,41 @@ export function Hero() {
   const { introComplete } = useIntroState();
   const lenis = useLenis();
   const prefersReducedMotion = useReducedMotion();
+  const scrollOpacityRef = useRef(1);
   const [scrollIndicatorOpacity, setScrollIndicatorOpacity] = useState(1);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const springConfig = { damping: 30, stiffness: 150, mass: 0.5 };
-  
-  const mouseX = useSpring(0, springConfig);
-  const mouseY = useSpring(0, springConfig);
+  /* ── Direct DOM tilt on mouse move — no React style conflict,
+     no Framer Motion RAF, no GSAP CSSPlugin. CSS transition handles reset. ── */
+  const tiltRef = useRef<HTMLDivElement>(null);
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (prefersReducedMotion || !containerRef.current) return;
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (prefersReducedMotion || !tiltRef.current) return;
     const { clientX, clientY } = e;
     const { innerWidth, innerHeight } = window;
     const x = (clientX / innerWidth) * 2 - 1;
     const y = (clientY / innerHeight) * 2 - 1;
-    mouseX.set(x);
-    mouseY.set(y);
-  };
+    // perspective() must be on the same element as rotateX/Y
+    tiltRef.current.style.transform =
+      `perspective(1000px) rotateX(${y * -3}deg) rotateY(${x * 3}deg)`;
+  }, [prefersReducedMotion]);
 
-  const handleMouseLeave = () => {
-    mouseX.set(0);
-    mouseY.set(0);
-  };
-
-  // 3D Tilt for main content
-  const rotateX = useTransform(mouseY, [-1, 1], [3, -3]);
-  const rotateY = useTransform(mouseX, [-1, 1], [-3, 3]);
+  const handleMouseLeave = useCallback(() => {
+    if (tiltRef.current) tiltRef.current.style.transform = "";
+  }, []);
 
   useEffect(() => {
     if (!lenis) return;
     const onScroll = () => {
       const progress = Math.min(lenis.scroll / SCROLL_FADE_DISTANCE, 1);
-      setScrollIndicatorOpacity(1 - progress);
+      // Once fully faded, unregister — no more scroll work needed
+      if (progress >= 1 && scrollOpacityRef.current === 0) return;
+      const newOpacity = 1 - progress;
+      // Only trigger React re-render when opacity changes by > 0.05
+      if (Math.abs(newOpacity - scrollOpacityRef.current) > 0.05) {
+        scrollOpacityRef.current = newOpacity;
+        setScrollIndicatorOpacity(newOpacity);
+      }
     };
     lenis.on("scroll", onScroll);
     return () => lenis.off("scroll", onScroll);
@@ -78,7 +83,6 @@ export function Hero() {
     <section
       id="home"
       className="relative min-h-screen overflow-hidden bg-background pt-20 md:pt-24 pb-12"
-      style={{ perspective: "1000px" }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       ref={containerRef}
@@ -92,8 +96,7 @@ export function Hero() {
         <div
           className="absolute -top-40 -left-40 w-[600px] h-[600px] rounded-full pointer-events-none transition-opacity duration-1000"
           style={{
-            background: "radial-gradient(circle, rgba(255,85,0,0.05) 0%, transparent 65%)",
-            filter: "blur(40px)",
+            background: "radial-gradient(circle, rgba(255,85,0,0.03) 0%, transparent 80%)",
           }}
         />
       </div>
@@ -111,9 +114,11 @@ export function Hero() {
         className="hero-inner-container relative z-10"
         initial={prefersReducedMotion ? "visible" : "hidden"}
         animate={shouldAnimate}
-        style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
       >
-        <div className="max-w-4xl" style={{ transform: "translateZ(40px)" }}>
+        {/* Inner wrapper for direct DOM tilt — separated from
+            motion.div so entrance animation and tilt don't conflict */}
+        <div ref={tiltRef} className="hero-tilt-wrapper" style={{ transformStyle: "preserve-3d" }}>
+          <div className="max-w-4xl" style={{ transform: "translateZ(40px)" }}>
           
           <motion.h1 className="h1 flex flex-col gap-2 uppercase tracking-tighter mb-8 leading-[0.9]">
             {/* Line 1 */}
@@ -198,6 +203,7 @@ export function Hero() {
           </motion.div>
 
         </div>
+        </div>
       </motion.div>
 
       {/* ── Scroll indicator ── */}
@@ -212,12 +218,7 @@ export function Hero() {
         </div>
       </div>
       
-      <style dangerouslySetInnerHTML={{__html: `
-        @keyframes scrollDown {
-          0% { transform: translateY(-100%); }
-          100% { transform: translateY(200%); }
-        }
-      `}} />
+
     </section>
   );
 }

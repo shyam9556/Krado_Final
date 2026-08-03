@@ -1,7 +1,11 @@
 "use client";
 
-import { motion, useReducedMotion, useScroll, useTransform, type MotionValue } from "framer-motion";
-import { useRef } from "react";
+import "@/styles/marquee.css";
+
+import { useRef, useEffect, useCallback, memo } from "react";
+import { useReducedMotion } from "framer-motion";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 interface Project {
   name: string;
@@ -28,35 +32,60 @@ const PROJECTS: Project[] = [
 const ROW_ONE = PROJECTS.slice(0, 5);
 const ROW_TWO = PROJECTS.slice(5);
 
-function MarqueeTile({ project }: { project: Project }) {
+/* Shared timestamp — updated by ScrollTrigger onUpdate.
+   MarqueeTile reads this to decide if we're actively scrolling.
+   Using a module-level variable avoids prop drilling and ref objects. */
+let _lastScrollTime = 0;
+const SCROLL_IDLE_MS = 150;
+
+function isActivelyScrolling(): boolean {
+  return performance.now() - _lastScrollTime < SCROLL_IDLE_MS;
+}
+
+const MarqueeTile = memo(function MarqueeTile({ project }: { project: Project }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  /* rAF gate — limits mousemove style updates to 1 per frame */
+  const rafPending = useRef(false);
 
-  // Direct DOM mutation for mouse spotlight — zero re-renders
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const card = cardRef.current;
-    if (!card) return;
-    const rect = card.getBoundingClientRect();
-    card.style.setProperty("--tile-mouse-x", `${e.clientX - rect.left}px`);
-    card.style.setProperty("--tile-mouse-y", `${e.clientY - rect.top}px`);
-  };
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (rafPending.current) return;
+    const x = e.clientX;
+    const y = e.clientY;
+    rafPending.current = true;
+    requestAnimationFrame(() => {
+      const card = cardRef.current;
+      if (card) {
+        const rect = card.getBoundingClientRect();
+        card.style.setProperty("--tile-mouse-x", `${x - rect.left}px`);
+        card.style.setProperty("--tile-mouse-y", `${y - rect.top}px`);
+      }
+      rafPending.current = false;
+    });
+  }, []);
 
-  // Hover-to-play — set src + play only for THIS card (max 1 GPU decoder)
-  const handleMouseEnter = () => {
+  // Hover-to-play — blocked during scroll to prevent chain-reaction
+  // video teardown+reload as the row slides under the cursor
+  const handleMouseEnter = useCallback(() => {
+    if (isActivelyScrolling()) return; // Block new video load during scroll
     const vid = videoRef.current;
     if (!vid) return;
     vid.src = videoSrc;
     vid.play().catch(() => {});
-  };
+  }, []);
 
-  // Pause + fully release — removes src to free all browser resources
-  const handleMouseLeave = () => {
+  // Pause + conditionally release — during scroll, only pause (cheap).
+  // Full teardown (removeAttribute + load) only when NOT scrolling.
+  const handleMouseLeave = useCallback(() => {
     const vid = videoRef.current;
     if (!vid) return;
-    vid.pause();
-    vid.removeAttribute("src");
-    vid.load();
-  };
+    vid.pause(); // Always pause — ~0.1ms, no spike
+    if (!isActivelyScrolling()) {
+      // Full teardown only when not scrolling
+      vid.removeAttribute("src");
+      vid.load();
+    }
+  }, []);
 
   // Local asset paths — image field is the basename
   const videoSrc  = `/videos/${project.image}.mp4`;
@@ -70,20 +99,20 @@ function MarqueeTile({ project }: { project: Project }) {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {/* ── Layer 1: WebP poster + Ken Burns — always visible, feels alive ── */}
+      {/* ── Layer 1: WebP poster — always visible ── */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={posterSrc}
         alt={project.name}
-        className="absolute inset-0 h-full w-full object-cover project-marquee-ken-burns"
+        className="absolute inset-0 h-full w-full object-cover"
         loading="lazy"
         decoding="async"
+        fetchPriority="low"
       />
 
       {/* ── Layer 2: MP4 video — no src at idle, set only on hover (zero overhead) ── */}
       <video
         ref={videoRef}
-        poster={posterSrc}
         loop
         muted
         playsInline
@@ -104,40 +133,91 @@ function MarqueeTile({ project }: { project: Project }) {
       </div>
     </div>
   );
-}
+});
 
-function MarqueeRow({
+const MarqueeRow = memo(function MarqueeRow({
   projects,
-  x,
+  rowRef,
 }: {
   projects: Project[];
-  x: MotionValue<number>;
+  rowRef: React.RefObject<HTMLDivElement | null>;
 }) {
-  const repeated = [...projects];
-
   return (
-    <motion.div className="flex gap-4 will-change-transform" style={{ x }}>
-      {repeated.map((project, index) => (
+    <div ref={rowRef} className="flex gap-4">
+      {projects.map((project, index) => (
         <MarqueeTile
           key={`${project.name}-${index}`}
           project={project}
         />
       ))}
-    </motion.div>
+    </div>
   );
-}
+});
 
 export function ProjectMarquee() {
   const sectionRef = useRef<HTMLDivElement>(null);
+  const rowOneRef = useRef<HTMLDivElement>(null);
+  const rowTwoRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = useReducedMotion();
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  });
 
-  const rowOneX = useTransform(scrollYProgress, [0, 1], prefersReducedMotion ? [0, 0] : [-220, 420]);
-  const rowTwoX = useTransform(scrollYProgress, [0, 1], prefersReducedMotion ? [0, 0] : [220, -420]);
+  /* ── GSAP scroll-driven parallax ── */
+  useEffect(() => {
+    if (prefersReducedMotion) return;
+    const section = sectionRef.current;
+    const rowOne = rowOneRef.current;
+    const rowTwo = rowTwoRef.current;
+    if (!section || !rowOne || !rowTwo) return;
 
+    /* Promote rows to GPU compositor layers */
+    gsap.set([rowOne, rowTwo], { willChange: "transform" });
+
+    const triggers: ScrollTrigger[] = [];
+
+    // Row 1: slides right as user scrolls down
+    const tween1 = gsap.fromTo(
+      rowOne,
+      { x: -220 },
+      {
+        x: 420,
+        ease: "none",
+        scrollTrigger: {
+          trigger: section,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: true,
+          /* Record timestamp on each scroll frame — MarqueeTile
+             checks this to decide if we're actively scrolling.
+             Zero allocations, zero GC pressure. */
+          onUpdate: () => {
+            _lastScrollTime = performance.now();
+          },
+        },
+      }
+    );
+    if (tween1.scrollTrigger) triggers.push(tween1.scrollTrigger);
+
+    // Row 2: slides left as user scrolls down
+    const tween2 = gsap.fromTo(
+      rowTwo,
+      { x: 220 },
+      {
+        x: -420,
+        ease: "none",
+        scrollTrigger: {
+          trigger: section,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: true,
+        },
+      }
+    );
+    if (tween2.scrollTrigger) triggers.push(tween2.scrollTrigger);
+
+    return () => {
+      triggers.forEach((st) => st.kill());
+      gsap.set([rowOne, rowTwo], { willChange: "auto" });
+    };
+  }, [prefersReducedMotion]);
 
   return (
     <div
@@ -153,8 +233,8 @@ export function ProjectMarquee() {
       </div>
 
       <div className="flex flex-col gap-4">
-        <MarqueeRow projects={ROW_ONE} x={rowOneX} />
-        <MarqueeRow projects={ROW_TWO} x={rowTwoX} />
+        <MarqueeRow projects={ROW_ONE} rowRef={rowOneRef} />
+        <MarqueeRow projects={ROW_TWO} rowRef={rowTwoRef} />
       </div>
     </div>
   );

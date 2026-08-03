@@ -1,25 +1,17 @@
 "use client";
 
-import { useRef, useEffect, useState, useCallback } from "react";
+import "@/styles/about.css";
+
+import { useRef, useEffect, useCallback, memo } from "react";
 import {
-  motion,
   useReducedMotion,
-  useSpring,
-  useTransform,
 } from "framer-motion";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Magnetic } from "@/components/ui/Magnetic";
 import { Code2, Compass, Gem, Rocket, type LucideIcon } from "lucide-react";
 import { ProjectMarquee } from "./ProjectMarquee";
-import dynamic from "next/dynamic";
-
-// Dynamic import with ssr:false — prevents THREE.js from running during Next.js
-// static page prerendering where WebGL / window / requestAnimationFrame don't exist.
-const TorusKnotScene = dynamic(
-  () => import("@/components/ui/TorusKnotScene").then((m) => ({ default: m.TorusKnotScene })),
-  { ssr: false }
-);
+import { TorusKnotCanvas } from "@/components/ui/TorusKnotCanvas";
 
 
 
@@ -101,14 +93,14 @@ const TICKER_ITEMS = [
 
 const SCRAMBLE_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#%&!";
 
-function ManifestoLine({
+const ManifestoLine = memo(function ManifestoLine({
   text,
   accent,
 }: {
   text: string;
   accent: boolean;
 }) {
-  const [displayText, setDisplayText] = useState(text);
+  const spanRef = useRef<HTMLSpanElement>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const iterRef = useRef(0);
   const prefersReducedMotion = useReducedMotion();
@@ -120,31 +112,32 @@ function ManifestoLine({
     if (intervalRef.current) clearInterval(intervalRef.current);
 
     intervalRef.current = setInterval(() => {
-      setDisplayText(
-        text
-          .split("")
-          .map((char, i) => {
-            if (char === " " || char === "'" || char === ".") return char;
-            if (i < iterRef.current) return text[i];
-            return SCRAMBLE_CHARS[
-              Math.floor(Math.random() * SCRAMBLE_CHARS.length)
-            ];
-          })
-          .join("")
-      );
+      const scrambled = text
+        .split("")
+        .map((char, i) => {
+          if (char === " " || char === "'" || char === ".") return char;
+          if (i < iterRef.current) return text[i];
+          return SCRAMBLE_CHARS[
+            Math.floor(Math.random() * SCRAMBLE_CHARS.length)
+          ];
+        })
+        .join("");
+
+      // Direct DOM mutation — zero React re-renders
+      if (spanRef.current) spanRef.current.textContent = scrambled;
 
       iterRef.current += 1;
 
       if (iterRef.current >= text.length + 1) {
         if (intervalRef.current) clearInterval(intervalRef.current);
-        setDisplayText(text);
+        if (spanRef.current) spanRef.current.textContent = text;
       }
-    }, 25);
+    }, 40);
   }, [text, prefersReducedMotion]);
 
   const handleMouseLeave = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
-    setDisplayText(text);
+    if (spanRef.current) spanRef.current.textContent = text;
   }, [text]);
 
   useEffect(() => {
@@ -155,16 +148,17 @@ function ManifestoLine({
 
   return (
     <span
+      ref={spanRef}
       className={`about-manifesto__line ${
         accent ? "about-manifesto__accent" : ""
       }`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {displayText}
+      {text}
     </span>
   );
-}
+});
 
 /* ═══════════════════════════════════════════════════════════
    VALUE CARD — Glass card with 3D tilt, cursor spotlight,
@@ -328,10 +322,31 @@ function AnimatedStat({
    ═══════════════════════════════════════════════════════════ */
 
 function MarqueeTicker() {
+  const tickerRef = useRef<HTMLDivElement>(null);
   const items = [...TICKER_ITEMS, ...TICKER_ITEMS];
 
+  // Pause both animation tracks when the ticker is offscreen.
+  // Uses classList.toggle instead of useState to avoid re-rendering
+  // 64 span elements when visibility changes.
+  useEffect(() => {
+    const el = tickerRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        el.classList.toggle("about-marquee--paused", !entry.isIntersecting);
+      },
+      { rootMargin: "100px 0px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <div className="about-marquee" aria-hidden="true">
+    <div
+      ref={tickerRef}
+      className="about-marquee"
+      aria-hidden="true"
+    >
       {/* Primary track — left-scrolling */}
       <div className="about-marquee__track">
         {items.map((item, i) => (
@@ -368,35 +383,29 @@ export function About() {
   const statsRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = useReducedMotion();
 
-  /* ── Mouse-tilt parallax for manifesto headline ── */
-  const springConfig = { damping: 40, stiffness: 120, mass: 0.8 };
-  const mouseX = useSpring(0, springConfig);
-  const mouseY = useSpring(0, springConfig);
-
-  const translateX = useTransform(mouseX, [-1, 1], [-12, 12]);
-  const translateY = useTransform(mouseY, [-1, 1], [-8, 8]);
-
-  /* ── rAF-throttled section mouse move — prevents spring updates on every scroll tick ── */
+  /* ── rAF-throttled section mouse move ──
+     Writes transform directly on manifestoRef to avoid React style
+     reconciliation conflicts. Same pattern as ValueCard / ServiceRow. */
   const rafRef = useRef<number | null>(null);
 
   const handleMouseMove = useCallback(
     (e: React.MouseEvent) => {
       if (prefersReducedMotion || !sectionRef.current) return;
-      // Cancel any pending frame so we only process the latest position
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
       const clientX = e.clientX;
       const clientY = e.clientY;
       rafRef.current = requestAnimationFrame(() => {
-        if (!sectionRef.current) return;
+        if (!sectionRef.current || !manifestoRef.current) return;
         const rect = sectionRef.current.getBoundingClientRect();
         const x = ((clientX - rect.left) / rect.width) * 2 - 1;
         const y = ((clientY - rect.top) / rect.height) * 2 - 1;
-        mouseX.set(x);
-        mouseY.set(y);
+        // Direct DOM mutation — bypasses React style tracking entirely
+        manifestoRef.current.style.transform =
+          `translate(${x * 12}px, ${y * 8}px)`;
         rafRef.current = null;
       });
     },
-    [prefersReducedMotion, mouseX, mouseY]
+    [prefersReducedMotion]
   );
 
   const handleMouseLeave = useCallback(() => {
@@ -404,9 +413,8 @@ export function About() {
       cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
     }
-    mouseX.set(0);
-    mouseY.set(0);
-  }, [mouseX, mouseY]);
+    if (manifestoRef.current) manifestoRef.current.style.transform = "";
+  }, []);
 
   /* ── GSAP scroll entrance animations ── */
   useEffect(() => {
@@ -420,8 +428,10 @@ export function About() {
     const stats = statsRef.current;
     if (!section || !heading) return;
 
+    const triggers: ScrollTrigger[] = [];
+
     // Heading entrance
-    gsap.fromTo(
+    const headingTween = gsap.fromTo(
       heading,
       { y: 50, opacity: 0 },
       {
@@ -433,14 +443,16 @@ export function About() {
           trigger: section,
           start: "top 80%",
           toggleActions: "play none none none",
+          once: true,
         },
       }
     );
+    if (headingTween.scrollTrigger) triggers.push(headingTween.scrollTrigger);
 
     // Manifesto lines — staggered reveal with slight 3D rotation
     if (manifesto) {
       const lines = manifesto.querySelectorAll(".about-manifesto__line");
-      gsap.fromTo(
+      const manifestoTween = gsap.fromTo(
         lines,
         { y: 80, opacity: 0, rotateX: 12 },
         {
@@ -454,14 +466,16 @@ export function About() {
             trigger: manifesto,
             start: "top 82%",
             toggleActions: "play none none none",
+            once: true,
           },
         }
       );
+      if (manifestoTween.scrollTrigger) triggers.push(manifestoTween.scrollTrigger);
     }
 
     // Body text entrance
     if (body) {
-      gsap.fromTo(
+      const bodyTween = gsap.fromTo(
         body,
         { y: 40, opacity: 0 },
         {
@@ -474,14 +488,16 @@ export function About() {
             trigger: body,
             start: "top 85%",
             toggleActions: "play none none none",
+            once: true,
           },
         }
       );
+      if (bodyTween.scrollTrigger) triggers.push(bodyTween.scrollTrigger);
     }
 
     // Values tag entrance
     if (valuesTag) {
-      gsap.fromTo(
+      const valuesTagTween = gsap.fromTo(
         valuesTag,
         { y: 30, opacity: 0 },
         {
@@ -493,15 +509,17 @@ export function About() {
             trigger: valuesTag,
             start: "top 88%",
             toggleActions: "play none none none",
+            once: true,
           },
         }
       );
+      if (valuesTagTween.scrollTrigger) triggers.push(valuesTagTween.scrollTrigger);
     }
 
     // Value cards — staggered domino entrance with tilt
     if (values) {
       const cards = values.querySelectorAll(".about-value-card");
-      gsap.fromTo(
+      const cardsTween = gsap.fromTo(
         cards,
         { y: 60, opacity: 0, rotateX: 6 },
         {
@@ -515,15 +533,17 @@ export function About() {
             trigger: values,
             start: "top 85%",
             toggleActions: "play none none none",
+            once: true,
           },
         }
       );
+      if (cardsTween.scrollTrigger) triggers.push(cardsTween.scrollTrigger);
     }
 
     // Stats entrance — staggered
     if (stats) {
       const statEls = stats.querySelectorAll(".about-stat");
-      gsap.fromTo(
+      const statsTween = gsap.fromTo(
         statEls,
         { y: 30, opacity: 0 },
         {
@@ -536,15 +556,17 @@ export function About() {
             trigger: stats,
             start: "top 88%",
             toggleActions: "play none none none",
+            once: true,
           },
         }
       );
+      if (statsTween.scrollTrigger) triggers.push(statsTween.scrollTrigger);
     }
 
     // Horizontal rule animation
     const rule = section.querySelector(".about-divider-line");
     if (rule) {
-      gsap.fromTo(
+      const ruleTween = gsap.fromTo(
         rule,
         { scaleX: 0 },
         {
@@ -555,30 +577,18 @@ export function About() {
             trigger: rule,
             start: "top 88%",
             toggleActions: "play none none none",
+            once: true,
           },
         }
       );
+      if (ruleTween.scrollTrigger) triggers.push(ruleTween.scrollTrigger);
     }
 
-    const timer = setTimeout(() => ScrollTrigger.refresh(), 200);
-
     return () => {
-      clearTimeout(timer);
-      ScrollTrigger.getAll().forEach((st) => {
-        if (
-          st.trigger === section ||
-          st.trigger === manifesto ||
-          st.trigger === body ||
-          st.trigger === stats ||
-          st.trigger === rule ||
-          st.trigger === values ||
-          st.trigger === valuesTag
-        ) {
-          st.kill();
-        }
-      });
+      triggers.forEach((st) => st.kill());
     };
   }, [prefersReducedMotion]);
+
 
   /* ── Manifesto lines ── */
   const manifestoLines = [
@@ -605,16 +615,14 @@ export function About() {
           className="about-glow-orb about-glow-orb--top"
           style={{
             background:
-              "radial-gradient(circle, rgba(255,85,0,0.06) 0%, transparent 55%)",
-            filter: "blur(80px)",
+              "radial-gradient(circle, rgba(255,85,0,0.035) 0%, transparent 82%)",
           }}
         />
         <div
           className="about-glow-orb about-glow-orb--bottom"
           style={{
             background:
-              "radial-gradient(circle, rgba(255,85,0,0.04) 0%, transparent 60%)",
-            filter: "blur(60px)",
+              "radial-gradient(circle, rgba(255,85,0,0.025) 0%, transparent 82%)",
           }}
         />
       </div>
@@ -639,17 +647,13 @@ export function About() {
             style={{ transformOrigin: "left" }}
           />
 
-          {/* Three.js torus knot — GPU, zero main-thread math, desktop only */}
-          {!prefersReducedMotion && <TorusKnotScene />}
+          {/* Canvas 2D data sphere — desktop only, paused on reduced motion */}
+          {!prefersReducedMotion && <TorusKnotCanvas />}
 
           {/* Manifesto headline with mouse parallax + scramble hover */}
-          <motion.div
+          <div
             ref={manifestoRef}
             className="about-manifesto"
-            style={{
-              x: translateX,
-              y: translateY,
-            }}
           >
             {manifestoLines.map((line, i) => (
               <ManifestoLine
@@ -658,7 +662,7 @@ export function About() {
                 accent={line.accent}
               />
             ))}
-          </motion.div>
+          </div>
 
           {/* Body text */}
           <div ref={bodyRef} className="about-manifesto-body">

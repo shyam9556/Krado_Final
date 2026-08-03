@@ -38,6 +38,8 @@ export function DecodeIntro() {
     try {
       sessionStorage.setItem(INTRO_SESSION_KEY, "1");
     } catch {}
+    // Notify IntroStateProvider directly — no more polling needed
+    window.dispatchEvent(new Event("krado:intro-complete"));
   }, []);
 
   const handleExitComplete = useCallback(() => {

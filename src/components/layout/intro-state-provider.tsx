@@ -33,24 +33,21 @@ export function IntroStateProvider({
   const [introComplete, setIntroComplete] = useState(false);
 
   useEffect(() => {
-    // Poll until DecodeIntro finishes and sets the session key.
-    // We intentionally do NOT check the key synchronously on mount
-    // because DecodeIntro clears the key on its own mount to replay
-    // every refresh — a synchronous check could hit a stale value
-    // before the clear runs.
-    const interval = setInterval(() => {
-      try {
-        if (sessionStorage.getItem(INTRO_SESSION_KEY)) {
-          setIntroComplete(true);
-          clearInterval(interval);
-        }
-      } catch {
+    // One-time check for returning visitors (session key already set)
+    try {
+      if (sessionStorage.getItem(INTRO_SESSION_KEY)) {
         setIntroComplete(true);
-        clearInterval(interval);
+        return;
       }
-    }, 100);
+    } catch {
+      setIntroComplete(true);
+      return;
+    }
 
-    return () => clearInterval(interval);
+    // Listen for DecodeIntro's completion event — replaces 100ms polling
+    const handler = () => setIntroComplete(true);
+    window.addEventListener("krado:intro-complete", handler);
+    return () => window.removeEventListener("krado:intro-complete", handler);
   }, []);
 
   return (

@@ -1,5 +1,7 @@
 "use client";
 
+import "@/styles/navbar.css";
+
 import { useEffect, useRef } from "react";
 import { motion, AnimatePresence, useReducedMotion, Variants } from "framer-motion";
 import { ThemeToggle } from "@/components/layout/theme-toggle";

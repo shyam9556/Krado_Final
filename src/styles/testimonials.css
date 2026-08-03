@@ -1,0 +1,25 @@
+﻿/* ============================================================
+   TESTIMONIALS SECTION (3D COVERFLOW EDITION)
+   ============================================================ */
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+.perspective-container {
+  perspective: 1200px;
+}
+
+.testimonials-quote-decode {
+  display: inline-block;
+  font-family: var(--font-heading);
+}
+
+.is-active-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 1rem;
+  box-shadow: inset 0 0 0 1px rgba(255, 85, 0, 0.3), 0 0 40px rgba(255, 85, 0, 0.15);
+  pointer-events: none;
+  transition: all 0.5s ease;
+}

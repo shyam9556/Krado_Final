@@ -1,5 +1,7 @@
 "use client";
 
+import "@/styles/work.css";
+
 import { useRef, useLayoutEffect, useState, useEffect } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -39,11 +41,11 @@ const PROJECTS: Project[] = [
   { id: "jivraj", index: "03", name: "JIVRAJ CAPITAL",
     description: "Premium investment capital and wealth management dashboard.",
     tags: ["React", "TypeScript", "Python", "Docker", "PostgreSQL"],
-    image: "/jivraj-tall.webp", videoUrl: "/JivrajCapital.mp4", videoTour: true, mockupType: "desktop", imageAlt: "Jivraj Capital financial dashboard", year: "2024", category: "Finance & Investment", url: "https://jivrajcapital.com" },
+    image: "/jivraj-tall.webp", videoUrl: "/videos/JivrajCapital.mp4", videoTour: true, mockupType: "desktop", imageAlt: "Jivraj Capital financial dashboard", year: "2024", category: "Finance & Investment", url: "https://jivrajcapital.com" },
   { id: "hrpl", index: "04", name: "HRPL PRO",
     description: "Data-rich enterprise-scale full ERP system and operations dashboard.",
     tags: ["Vue.js", "Django", "GraphQL", "Redis", "Kubernetes"],
-    image: "/work-hrpl.webp", videoUrl: "/HRPL.mp4", videoTour: true, mockupType: "desktop", imageAlt: "HRPL Pro enterprise ERP system", year: "2023", category: "Enterprise ERP" },
+    image: "/work-hrpl.webp", videoUrl: "/videos/HRPL.mp4", videoTour: true, mockupType: "desktop", imageAlt: "HRPL Pro enterprise ERP system", year: "2023", category: "Enterprise ERP" },
 ];
 
 const TOTAL_PANELS = PROJECTS.length + 1; // 4 projects + 1 closing
@@ -54,7 +56,7 @@ const TECH_ICONS: Record<string, string> = {
   "Node.js":    "nodedotjs",
   "PostgreSQL": "postgresql",
   "Redis":      "redis",
-  "AWS":        "https://unpkg.com/simple-icons@v11/icons/amazonaws.svg",
+  "AWS":        "amazonaws",
   "Firebase":   "firebase",
   "Next.js":    "nextdotjs",
   "TypeScript": "typescript",
@@ -89,7 +91,7 @@ function FloatingTechIcons({ tags }: { tags: string[] }) {
     <div className="work-floating-icons" aria-hidden="true">
       {tags.slice(0, 3).map((tag, i) => {
         const mapped = TECH_ICONS[tag] ?? tag.toLowerCase().replace(/[^a-z0-9]/g, "");
-        const maskUrl = mapped.startsWith("http") ? mapped : `https://cdn.simpleicons.org/${mapped}`;
+        const maskUrl = `/icons/${mapped}.svg`;
         const slot = FLOAT_SLOTS[i];
         return (
           <div
@@ -168,7 +170,7 @@ function LaptopMockup({ tallImage, shortImage, videoUrl, isVideo, priority }: { 
         {/* Screen Content */}
         <div className="relative bg-black rounded-[4px] md:rounded-md overflow-hidden aspect-[16/10] w-full work-laptop-screen">
           {videoUrl ? (
-            <video ref={videoRef} src={videoUrl} loop muted playsInline preload="metadata" poster={shortImage} className="w-full h-full object-cover group-hover:brightness-75 transition-all duration-500 pointer-events-none" />
+            <video ref={videoRef} src={videoUrl} loop muted playsInline preload="none" poster={shortImage} className="w-full h-full object-cover group-hover:brightness-75 transition-all duration-500 pointer-events-none" />
           ) : (
             <div className={`w-full absolute inset-x-0 top-0 ${isVideo ? 'animate-website-scroll' : ''}`}>
                <Image src={isVideo ? tallImage! : shortImage} alt="Website Tour" width={1920} height={4000} sizes="(max-width: 1024px) 100vw, 1024px" quality={75} className="w-full h-auto object-cover group-hover:brightness-75 transition-all duration-500" priority={priority} loading={priority ? "eager" : "lazy"} />
@@ -215,7 +217,7 @@ function DesktopMonitorMockup({ videoUrl, shortImage, priority }: { videoUrl?: s
         {/* Screen Content */}
         <div className="relative bg-black rounded-[4px] md:rounded-lg overflow-hidden aspect-[16/9] w-full">
           {videoUrl ? (
-            <video ref={videoRef} src={videoUrl} loop muted playsInline preload="metadata" poster={shortImage} className="w-full h-full object-cover group-hover:brightness-75 transition-all duration-500 pointer-events-none" />
+            <video ref={videoRef} src={videoUrl} loop muted playsInline preload="none" poster={shortImage} className="w-full h-full object-cover group-hover:brightness-75 transition-all duration-500 pointer-events-none" />
           ) : (
             <Image src={shortImage!} alt="Dashboard Tour" fill sizes="(max-width: 1024px) 100vw, 1024px" quality={75} className="w-full h-full object-cover group-hover:brightness-75 transition-all duration-500" priority={priority} />
           )}
@@ -263,7 +265,7 @@ function MobileProjectCard({ project, idx }: { project: Project; idx: number }) 
           
           {/* Simulated Video Tour Indicator */}
           {project.videoTour && (
-            <div className="absolute -top-3 -left-2 z-20 flex items-center gap-2 px-2.5 py-1 bg-black/60 backdrop-blur-md rounded-full border border-white/10 pointer-events-none">
+            <div className="absolute -top-3 -left-2 z-20 flex items-center gap-2 px-2.5 py-1 bg-black/80 rounded-full border border-white/10 pointer-events-none">
               <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
               <span className="text-white/90 text-[9px] font-mono uppercase tracking-widest font-semibold mt-[1px]">Live</span>
             </div>
@@ -283,7 +285,7 @@ function MobileProjectCard({ project, idx }: { project: Project; idx: number }) 
           )}
 
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-30">
-            <span className="px-4 py-2 bg-black/60 backdrop-blur-md border border-white/20 text-white text-xs uppercase tracking-wider rounded-full flex items-center gap-2">
+            <span className="px-4 py-2 bg-black/80 border border-white/20 text-white text-xs uppercase tracking-wider rounded-full flex items-center gap-2">
               Visit Site
               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
             </span>
@@ -292,7 +294,7 @@ function MobileProjectCard({ project, idx }: { project: Project; idx: number }) 
       ) : (
         <div className="work-mobile-image-wrap overflow-visible">
           {project.videoTour && (
-            <div className="absolute -top-3 -left-2 z-20 flex items-center gap-2 px-2.5 py-1 bg-black/60 backdrop-blur-md rounded-full border border-white/10 pointer-events-none">
+            <div className="absolute -top-3 -left-2 z-20 flex items-center gap-2 px-2.5 py-1 bg-black/80 rounded-full border border-white/10 pointer-events-none">
               <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
               <span className="text-white/90 text-[9px] font-mono uppercase tracking-widest font-semibold mt-[1px]">Live Tour</span>
             </div>
@@ -322,7 +324,7 @@ function MobileProjectCard({ project, idx }: { project: Project; idx: number }) 
         <div className="work-mobile-tags" role="list">
           {project.tags.map(tag => {
             const mapped = TECH_ICONS[tag] ?? tag.toLowerCase().replace(/[^a-z0-9]/g, "");
-            const maskUrl = mapped.startsWith("http") ? mapped : `https://cdn.simpleicons.org/${mapped}`;
+            const maskUrl = `/icons/${mapped}.svg`;
             return (
               <span key={tag} className="work-tag-chip" role="listitem" title={tag}>
                 <span className="work-tag-inner">
@@ -352,10 +354,11 @@ export function Work() {
   const prevActiveRef = useRef(-1);
 
   useLayoutEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768);
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
+    const mq = window.matchMedia("(max-width: 767px)");
+    setIsMobile(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
   }, []);
 
   /* ════════════════════════════════════════════════════════════
@@ -417,6 +420,8 @@ export function Work() {
     });
 
     /* Mouse parallax + 3D tilt + floating icons + mesh */
+    const cleanupFns: (() => void)[] = [];
+
     if (!noMotion) {
       allPanels.forEach(panel => {
         const img        = panel.querySelector<HTMLElement>(".work-panel-image");
@@ -456,6 +461,12 @@ export function Work() {
 
         panel.addEventListener("mousemove", onMove);
         panel.addEventListener("mouseleave", onLeave);
+
+        // Store cleanup so listeners are removed on re-run / unmount
+        cleanupFns.push(() => {
+          panel.removeEventListener("mousemove", onMove);
+          panel.removeEventListener("mouseleave", onLeave);
+        });
       });
     }
 
@@ -490,6 +501,12 @@ export function Work() {
       });
       prevActiveRef.current = 0;
     }
+
+    // Cleanup non-GSAP side effects — useGSAP auto-reverts GSAP tweens,
+    // but raw DOM listeners must be removed manually.
+    return () => {
+      cleanupFns.forEach(fn => fn());
+    };
   }, { scope: sectionRef, dependencies: [isMobile] });
 
   return (
@@ -627,7 +644,7 @@ function DesktopPanel({ project, isActive }: { project: Project; isActive: boole
           
           {/* Simulated Video Tour Indicator */}
           {project.videoTour && (
-            <div className="absolute top-0 left-0 z-20 flex items-center gap-2.5 px-3.5 py-1.5 bg-black/60 backdrop-blur-md rounded-full border border-white/10 pointer-events-none">
+            <div className="absolute top-0 left-0 z-20 flex items-center gap-2.5 px-3.5 py-1.5 bg-black/80 rounded-full border border-white/10 pointer-events-none">
               <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
               <span className="text-white/90 text-[10px] font-mono uppercase tracking-widest font-semibold mt-[1px]">Live Tour</span>
             </div>
@@ -637,19 +654,19 @@ function DesktopPanel({ project, isActive }: { project: Project; isActive: boole
             project.mockupType === "desktop" ? (
                <DesktopMonitorMockup videoUrl={project.videoUrl} shortImage={project.image} />
             ) : (
-               <LaptopMockup isVideo={project.videoTour} tallImage={project.imageTall} shortImage={project.image} videoUrl={project.videoUrl} priority={project.index === "01"} />
+               <LaptopMockup isVideo={project.videoTour} tallImage={project.imageTall} shortImage={project.image} videoUrl={project.videoUrl} priority={project.index <= "02"} />
             )
           ) : (
             <>
               <Image src={project.image} alt={project.imageAlt} fill sizes="55vw" quality={75}
-                className="work-panel-image group-hover:scale-105 group-hover:brightness-50 transition-all duration-700" priority={project.index === "01"} />
+                className="work-panel-image group-hover:scale-105 group-hover:brightness-50 transition-all duration-700" priority={project.index <= "02"} />
               <div className="work-panel-image-fade pointer-events-none" />
               <div className="work-panel-grain pointer-events-none" aria-hidden="true" />
             </>
           )}
           
           <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-30 pointer-events-none">
-            <span className="px-8 py-4 bg-white/10 backdrop-blur-md border border-white/20 text-white font-mono uppercase tracking-widest text-sm rounded-full shadow-[0_0_40px_rgba(255,255,255,0.15)] flex items-center gap-3 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500">
+            <span className="px-8 py-4 bg-[#1a1a2e]/90 border border-white/20 text-white font-mono uppercase tracking-widest text-sm rounded-full shadow-[0_0_40px_rgba(255,255,255,0.15)] flex items-center gap-3 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500">
               Visit Live Site
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
             </span>
@@ -658,7 +675,7 @@ function DesktopPanel({ project, isActive }: { project: Project; isActive: boole
       ) : (
         <div className="work-panel-image-wrap flex items-center overflow-visible">
           {project.videoTour && (
-            <div className="absolute top-0 left-0 z-20 flex items-center gap-2.5 px-3.5 py-1.5 bg-black/60 backdrop-blur-md rounded-full border border-white/10 pointer-events-none">
+            <div className="absolute top-0 left-0 z-20 flex items-center gap-2.5 px-3.5 py-1.5 bg-black/80 rounded-full border border-white/10 pointer-events-none">
               <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
               <span className="text-white/90 text-[10px] font-mono uppercase tracking-widest font-semibold mt-[1px]">Live Tour</span>
             </div>
@@ -667,12 +684,12 @@ function DesktopPanel({ project, isActive }: { project: Project; isActive: boole
             project.mockupType === "desktop" ? (
                <DesktopMonitorMockup videoUrl={project.videoUrl} shortImage={project.image} />
             ) : (
-               <LaptopMockup isVideo={project.videoTour} tallImage={project.imageTall} shortImage={project.image} videoUrl={project.videoUrl} priority={project.index === "01"} />
+               <LaptopMockup isVideo={project.videoTour} tallImage={project.imageTall} shortImage={project.image} videoUrl={project.videoUrl} priority={project.index <= "02"} />
             )
           ) : (
             <>
               <Image src={project.image} alt={project.imageAlt} fill sizes="55vw" quality={75}
-                className="work-panel-image" priority={project.index === "01"} />
+                className="work-panel-image" priority={project.index <= "02"} />
               <div className="work-panel-image-fade pointer-events-none" />
               <div className="work-panel-grain pointer-events-none" aria-hidden="true" />
             </>
@@ -710,7 +727,7 @@ function DesktopPanel({ project, isActive }: { project: Project; isActive: boole
         <div className="work-panel-tags" role="list">
           {project.tags.map((tag, i) => {
             const mapped = TECH_ICONS[tag] ?? tag.toLowerCase().replace(/[^a-z0-9]/g, "");
-            const maskUrl = mapped.startsWith("http") ? mapped : `https://cdn.simpleicons.org/${mapped}`;
+            const maskUrl = `/icons/${mapped}.svg`;
             return (
               <span
                 key={tag}

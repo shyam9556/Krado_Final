@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
+import { useIntroState } from "@/components/layout/intro-state-provider";
 
 /* ─────────────────────────────────────────────────────────────
    HeroCanvas — Interactive 3D constellation with floating
@@ -130,6 +131,7 @@ interface Particle {
 }
 
 export function HeroCanvas() {
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
   const mouseRef = useRef({ x: 0.5, y: 0.5, active: false });
@@ -139,6 +141,21 @@ export function HeroCanvas() {
   const shapesRef = useRef<Shape[]>([]);
   const particlesRef = useRef<Particle[]>([]);
   const initedRef = useRef(false);
+  const { introComplete } = useIntroState();
+  const [isMounted, setIsMounted] = useState(true);
+
+  // Unmount canvas entirely when hero scrolls out of view.
+  // Frees Canvas 2D context + stops all RAF callbacks.
+  useEffect(() => {
+    const el = wrapperRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsMounted(entry.isIntersecting),
+      { rootMargin: "100px 0px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const initScene = useCallback((w: number, h: number) => {
     // ── Create shapes ──
@@ -200,7 +217,8 @@ export function HeroCanvas() {
 
     // ── Create particles ──
     const particles: Particle[] = [];
-    const particleCount = Math.floor(Math.min(w * h * 0.00008, 60));
+    const isMobile = w < 768;
+    const particleCount = Math.floor(Math.min(w * h * 0.00008, isMobile ? 25 : 40));
     for (let i = 0; i < particleCount; i++) {
       // Concentrate particles on the right side (60% - 100% width)
       const x = w * (0.45 + Math.random() * 0.55);
@@ -224,6 +242,11 @@ export function HeroCanvas() {
   }, []);
 
   useEffect(() => {
+    // Don't start animation until DecodeIntro has finished —
+    // prevents GPU contention between particle physics and intro effects.
+    // Critical on mobile where GPU is shared with the OS.
+    if (!introComplete || !isMounted) return;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d", { alpha: true });
@@ -442,41 +465,27 @@ export function HeroCanvas() {
         ctx.fill();
       }
 
-      if (isVisible) {
-        animRef.current = requestAnimationFrame(animate);
-      }
+      animRef.current = requestAnimationFrame(animate);
     };
-
-    let isVisible = true;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        const wasVisible = isVisible;
-        isVisible = entry.isIntersecting;
-        if (isVisible && !wasVisible) {
-          cancelAnimationFrame(animRef.current);
-          animRef.current = requestAnimationFrame(animate);
-        }
-      },
-      { threshold: 0 }
-    );
-    observer.observe(canvas);
 
     animRef.current = requestAnimationFrame(animate);
 
     return () => {
-      observer.disconnect();
       cancelAnimationFrame(animRef.current);
       window.removeEventListener("resize", resize);
       window.removeEventListener("mousemove", handleMouseMove);
       canvas.removeEventListener("mouseleave", handleMouseLeave);
     };
-  }, [initScene]);
+  }, [initScene, introComplete, isMounted]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="hero-canvas-3d"
-      aria-hidden="true"
-    />
+    <div ref={wrapperRef} className="hero-canvas-3d" aria-hidden="true">
+      {isMounted && (
+        <canvas
+          ref={canvasRef}
+          style={{ width: "100%", height: "100%" }}
+        />
+      )}
+    </div>
   );
 }

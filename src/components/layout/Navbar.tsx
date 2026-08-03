@@ -1,6 +1,8 @@
 /* eslint-disable */
 "use client";
 
+import "@/styles/navbar.css";
+
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
 import { gsap } from "gsap";

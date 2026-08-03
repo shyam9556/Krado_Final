@@ -1,17 +1,12 @@
 "use client";
 
+import "@/styles/services.css";
+
 import { useRef, useEffect, useState, useCallback } from "react";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import dynamic from "next/dynamic";
-
-// Dynamic import with ssr:false — prevents THREE.js from running during Next.js
-// static page prerendering where WebGL / window / requestAnimationFrame don't exist.
-const WireframeScene = dynamic(
-  () => import("@/components/ui/WireframeScene").then((m) => ({ default: m.WireframeScene })),
-  { ssr: false }
-);
+import { WireframeCanvas } from "@/components/ui/WireframeCanvas";
 
 import { MonitorSmartphone, Smartphone, CloudCog, PenTool, Bot, type LucideIcon } from "lucide-react";
 
@@ -82,7 +77,8 @@ function ServiceRow({
     }
     return false;
   });
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  // No tilt state — transform written directly to DOM to avoid
+  // 60 React re-renders/sec during hover (same pattern as ValueCard).
 
   /* Responsive detection */
   useEffect(() => {
@@ -97,8 +93,10 @@ function ServiceRow({
     const el = rowRef.current;
     if (!el) return;
 
+    const triggers: ScrollTrigger[] = [];
+
     // Entrance animation
-    gsap.fromTo(
+    const tween = gsap.fromTo(
       el,
       { opacity: 0, y: 50, rotateX: prefersReducedMotion ? 0 : 3 },
       {
@@ -112,26 +110,28 @@ function ServiceRow({
           start: "top 90%",
           end: "top 60%",
           toggleActions: "play none none none",
+          once: true,
         },
       }
     );
+    if (tween.scrollTrigger) triggers.push(tween.scrollTrigger);
 
     // Mobile: activate on scroll-into-view
     if (isMobile) {
-      ScrollTrigger.create({
-        trigger: el,
-        start: "top 70%",
-        end: "bottom 30%",
-        onToggle: (self) => {
-          setIsActive(self.isActive);
-        },
-      });
+      triggers.push(
+        ScrollTrigger.create({
+          trigger: el,
+          start: "top 70%",
+          end: "bottom 30%",
+          onToggle: (self) => {
+            setIsActive(self.isActive);
+          },
+        })
+      );
     }
 
     return () => {
-      ScrollTrigger.getAll().forEach((st) => {
-        if (st.trigger === el) st.kill();
-      });
+      triggers.forEach((st) => st.kill());
     };
   }, [isMobile, prefersReducedMotion]);
 
@@ -143,7 +143,8 @@ function ServiceRow({
   const handleMouseLeave = useCallback(() => {
     if (!isMobile) {
       setIsActive(false);
-      setTilt({ x: 0, y: 0 });
+      // Reset tilt directly on DOM — CSS transition handles the smooth ease-out
+      if (rowRef.current) rowRef.current.style.transform = "";
     }
   }, [isMobile]);
 
@@ -153,7 +154,9 @@ function ServiceRow({
       const rect = rowRef.current.getBoundingClientRect();
       const x = (e.clientX - rect.left) / rect.width - 0.5;
       const y = (e.clientY - rect.top) / rect.height - 0.5;
-      setTilt({ x: y * -2, y: x * 3 });
+      // Direct DOM mutation — zero React re-renders, same values as before
+      rowRef.current.style.transform =
+        `perspective(800px) rotateX(${y * -2}deg) rotateY(${x * 3}deg)`;
     },
     [isMobile, prefersReducedMotion]
   );
@@ -166,10 +169,8 @@ function ServiceRow({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onMouseMove={handleMouseMove}
-      style={{
-        transform: `perspective(800px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
-        transition: "transform 0.3s cubic-bezier(0.22, 1, 0.36, 1)",
-      }}
+      // No inline style — transform written by handleMouseMove directly,
+      // transition is in services.css (.services-row at 1024px breakpoint)
     >
       {/* Accent sweep line */}
       <span className="services-row__sweep" aria-hidden="true" />
@@ -219,8 +220,10 @@ export function Services() {
     const heading = headingRef.current;
     if (!section || !heading) return;
 
+    const triggers: ScrollTrigger[] = [];
+
     // Parallax on the heading
-    gsap.fromTo(
+    const headingTween = gsap.fromTo(
       heading,
       { y: 60, opacity: 0 },
       {
@@ -233,14 +236,16 @@ export function Services() {
           start: "top 80%",
           end: "top 40%",
           toggleActions: "play none none none",
+          once: true,
         },
       }
     );
+    if (headingTween.scrollTrigger) triggers.push(headingTween.scrollTrigger);
 
     // Horizontal rule decoration animation (if it exists)
     const rule = section.querySelector(".services-divider-line");
     if (rule) {
-      gsap.fromTo(
+      const ruleTween = gsap.fromTo(
         rule,
         { scaleX: 0 },
         {
@@ -251,21 +256,15 @@ export function Services() {
             trigger: rule,
             start: "top 85%",
             toggleActions: "play none none none",
+            once: true,
           },
         }
       );
+      if (ruleTween.scrollTrigger) triggers.push(ruleTween.scrollTrigger);
     }
 
-    // Refresh ScrollTrigger to fix scrolling issues with dynamic layouts
-    const timer = setTimeout(() => {
-      ScrollTrigger.refresh();
-    }, 200);
-
     return () => {
-      clearTimeout(timer);
-      ScrollTrigger.getAll().forEach((st) => {
-        if (st.trigger === section || st.trigger === rule) st.kill();
-      });
+      triggers.forEach((st) => st.kill());
     };
   }, [prefersReducedMotion]);
 
@@ -285,8 +284,7 @@ export function Services() {
           className="absolute -bottom-40 -right-40 w-[600px] h-[600px] rounded-full"
           style={{
             background:
-              "radial-gradient(circle, rgba(255,85,0,0.04) 0%, transparent 60%)",
-            filter: "blur(80px)",
+              "radial-gradient(circle, rgba(255,85,0,0.025) 0%, transparent 85%)",
           }}
         />
 
@@ -295,14 +293,13 @@ export function Services() {
           className="absolute -top-32 -left-32 w-[400px] h-[400px] rounded-full"
           style={{
             background:
-              "radial-gradient(circle, rgba(255,85,0,0.02) 0%, transparent 60%)",
-            filter: "blur(60px)",
+              "radial-gradient(circle, rgba(255,85,0,0.012) 0%, transparent 82%)",
           }}
         />
       </div>
 
-      {/* ── Three.js Wireframe Geometry — GPU icosahedron, replaces 2D canvas ── */}
-      <WireframeScene />
+      {/* Canvas 2D wireframe icosahedron — background decoration */}
+      <WireframeCanvas />
 
       {/* ── Vertical decorative label — mirrors Hero's "01" ── */}
       <div className="services-vertical-label" aria-hidden="true">

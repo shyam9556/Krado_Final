@@ -1,42 +1,50 @@
 /* eslint-disable */
 "use client";
 
-import React, { useRef, useState } from "react";
-import { motion } from "framer-motion";
+import React, { useRef, useCallback } from "react";
+import { motion, useMotionValue, useSpring } from "framer-motion";
 
 export function Magnetic({
   children,
   strength = 0.2,
-  springOptions = { type: "spring", stiffness: 150, damping: 15, mass: 0.1 },
+  springOptions = { stiffness: 150, damping: 15, mass: 0.1 },
 }: {
   children: React.ReactNode;
   strength?: number;
-  springOptions?: Record<string, unknown>;
+  springOptions?: { stiffness?: number; damping?: number; mass?: number };
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
 
-  const handleMouse = (e: React.MouseEvent<HTMLDivElement>) => {
-    const { clientX, clientY } = e;
-    if (!ref.current) return;
-    const { height, width, left, top } = ref.current.getBoundingClientRect();
-    const middleX = clientX - (left + width / 2);
-    const middleY = clientY - (top + height / 2);
-    setPosition({ x: middleX * strength, y: middleY * strength });
-  };
+  // MotionValues update the DOM directly — zero React re-renders on mousemove
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const springX = useSpring(x, springOptions);
+  const springY = useSpring(y, springOptions);
 
-  const reset = () => {
-    setPosition({ x: 0, y: 0 });
-  };
+  const handleMouse = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (!ref.current) return;
+      const { height, width, left, top } =
+        ref.current.getBoundingClientRect();
+      const middleX = e.clientX - (left + width / 2);
+      const middleY = e.clientY - (top + height / 2);
+      x.set(middleX * strength);
+      y.set(middleY * strength);
+    },
+    [strength, x, y]
+  );
+
+  const reset = useCallback(() => {
+    x.set(0);
+    y.set(0);
+  }, [x, y]);
 
   return (
     <motion.div
       ref={ref}
       onMouseMove={handleMouse}
       onMouseLeave={reset}
-      animate={{ x: position.x, y: position.y }}
-      transition={springOptions}
-      style={{ display: "inline-flex" }}
+      style={{ display: "inline-flex", x: springX, y: springY }}
     >
       {children}
     </motion.div>
