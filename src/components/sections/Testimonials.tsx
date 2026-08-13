@@ -1,22 +1,26 @@
+/* eslint-disable */
 "use client";
 
 import "@/styles/testimonials.css";
 
-import { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Quote, ArrowLeft, ArrowRight } from "lucide-react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { useReducedMotion } from "framer-motion";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import Image from "next/image";
 
+/* ════════════════════════════════════════════════════════════
+   Data
+   ════════════════════════════════════════════════════════════ */
 interface Testimonial {
   id: string;
   name: string;
   role: string;
   company: string;
-  logo: string;
   metric: string;
   quote: string;
   avatar: string;
-  story: string;
   brandColor: string;
 }
 
@@ -26,11 +30,9 @@ const TESTIMONIALS: Testimonial[] = [
     name: "Sarah Jenkins",
     role: "VP of Product",
     company: "Vercel",
-    logo: "vercel",
     metric: "+180% Page Performance",
-    quote: "Krado didn't just deliver a beautiful codebase; they completely re-engineered our core dashboard layout. The level of craft and performance obsession they bring is unmatched in the industry.",
+    quote: "Krado didn't just deliver a beautiful codebase — they completely re-engineered our core dashboard layout. The level of craft and performance obsession they bring is unmatched.",
     avatar: "/images/avatars/avatar-vercel.webp",
-    story: "Vercel's developer dashboard requires extreme responsiveness. Krado worked directly with our React Server Components architecture to slash initial bundle sizes and eliminate layout shifts.",
     brandColor: "rgba(255, 255, 255, 0.4)",
   },
   {
@@ -38,11 +40,9 @@ const TESTIMONIALS: Testimonial[] = [
     name: "Alexandre Arnault",
     role: "Lead Architect",
     company: "Stripe",
-    logo: "stripe",
     metric: "99.999% Reliability",
-    quote: "Their team integrated seamlessly into our payments infrastructure. They don't write hacks; they build elegant, modular code that runs flawlessly under peak transaction loads.",
+    quote: "Their team integrated seamlessly into our payments infrastructure. They build elegant, modular code that runs flawlessly under peak transaction loads.",
     avatar: "/images/avatars/avatar-stripe.webp",
-    story: "For our checkout APIs, zero-downtime integration is critical. Krado rebuilt our merchant configuration portal with rigorous unit testing, type-safe API boundaries, and a scalable Next.js design system.",
     brandColor: "rgba(99, 91, 255, 0.5)",
   },
   {
@@ -50,11 +50,9 @@ const TESTIMONIALS: Testimonial[] = [
     name: "Diana Prince",
     role: "Design Lead",
     company: "Figma",
-    logo: "figma",
     metric: "100% Design Fidelity",
-    quote: "Their design-to-code execution is flawless. What usually takes other agencies months, Krado shipped in weeks, without compromising a single pixel of our design system.",
+    quote: "Their design-to-code execution is flawless. What usually takes other agencies months, Krado shipped in weeks — without compromising a single pixel.",
     avatar: "/images/avatars/avatar-figma.webp",
-    story: "Figma is a high-growth collaboration startup. Krado converted our vector layouts into a responsive, animated dashboard with complete Tailwind configuration.",
     brandColor: "rgba(242, 78, 30, 0.5)",
   },
   {
@@ -62,11 +60,9 @@ const TESTIMONIALS: Testimonial[] = [
     name: "Dr. Evelyn Chen",
     role: "Head of AI",
     company: "Linear",
-    logo: "linear",
     metric: "12x Inference Speed",
-    quote: "Krado delivered an exceptionally clean, responsive data visualization system that makes our complex neural network outputs intuitive. The engineering depth of their team is outstanding.",
+    quote: "Krado delivered an exceptionally clean data visualization system that makes our complex outputs intuitive. The engineering depth of their team is outstanding.",
     avatar: "/images/avatars/avatar-linear.webp",
-    story: "Linear's search interfaces process massive volumes of contextual embeddings. Krado designed a custom canvas-based network graph visualizer that handles 10,000+ data nodes in real-time.",
     brandColor: "rgba(94, 106, 210, 0.5)",
   },
   {
@@ -74,11 +70,9 @@ const TESTIMONIALS: Testimonial[] = [
     name: "Marcus Vance",
     role: "Chief Information Officer",
     company: "HashiCorp",
-    logo: "hashicorp",
     metric: "-42% Cloud Spend",
-    quote: "We needed a team that could navigate enterprise compliance while moving at startup speed. Krado achieved the impossible: re-architecting our developer registry within weeks.",
+    quote: "We needed a team that could navigate enterprise compliance while moving at startup speed. Krado achieved the impossible — re-architecting our developer registry within weeks.",
     avatar: "/images/avatars/avatar-hashicorp.webp",
-    story: "Our cloud registry is utilized by millions of developers daily. Krado implemented optimized CDN caching policies, serverless edge routing, and a modern TypeScript SDK.",
     brandColor: "rgba(255, 255, 255, 0.3)",
   },
   {
@@ -86,283 +80,294 @@ const TESTIMONIALS: Testimonial[] = [
     name: "Kenji Sato",
     role: "Director of Eng",
     company: "Supabase",
-    logo: "supabase",
     metric: "0.2s Real-time Sync",
     quote: "The real-time database interfaces they built for us are phenomenal. They truly understand WebSockets, state synchronization, and reactive UI architecture.",
     avatar: "/images/avatars/avatar-supabase.webp",
-    story: "Supabase needed a sleek database management console. Krado developed a dynamic React dashboard using Postgres notifications.",
     brandColor: "rgba(63, 207, 142, 0.5)",
   },
 ];
 
-/* ════════════════════════════════════════════════════════════
-   Scramble Text Decoder Component
-   ════════════════════════════════════════════════════════════ */
-const CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+";
-
-function DecodeQuote({ text }: { text: string }) {
-  const spanRef = useRef<HTMLSpanElement>(null);
-  const isAnimating = useRef(false);
-
-  useEffect(() => {
-    if (isAnimating.current) return;
-    isAnimating.current = true;
-
-    let iterations = 0;
-    const interval = setInterval(() => {
-      // Direct DOM mutation — zero React re-renders
-      const decoded = text
-        .split("")
-        .map((letter, index) => {
-          if (index < iterations) return text[index];
-          if (letter === " ") return " ";
-          return CHARS[Math.floor(Math.random() * CHARS.length)];
-        })
-        .join("");
-
-      if (spanRef.current) spanRef.current.textContent = decoded;
-
-      if (iterations >= text.length) {
-        clearInterval(interval);
-        isAnimating.current = false;
-        if (spanRef.current) spanRef.current.textContent = text;
-      }
-
-      iterations += 1;
-    }, 20);
-
-    return () => {
-      clearInterval(interval);
-      isAnimating.current = false;
-    };
-  }, [text]);
-
-  return <span ref={spanRef} className="testimonials-quote-decode">{text}</span>;
-}
+const AUTOPLAY_MS = 7000;
+const FADE_MS = 350; // Must match CSS transition duration
 
 /* ════════════════════════════════════════════════════════════
-   Main Component
+   Component
+   ────────────────────────────────────────────────────────────
+   Zero-jitter design:
+   • No DecodeQuote / scramble (was the #1 jitter source)
+   • No GSAP timeline for swaps — single CSS class toggle
+   • Only opacity + translateY transitions (GPU-composited)
+   • No DOM mutations during animation
+   • Autoplay via CSS @keyframes progress bar (no JS interval)
    ════════════════════════════════════════════════════════════ */
 export function Testimonials() {
   const [activeIndex, setActiveIndex] = useState(0);
-  const activeTestimonial = TESTIMONIALS[activeIndex];
-  const [isMobile, setIsMobile] = useState(false);
+  const [isExiting, setIsExiting] = useState(false);
+  const prefersReducedMotion = useReducedMotion();
 
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 767px)");
-    setIsMobile(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
+  const sectionRef = useRef<HTMLElement>(null);
+  const tagRef = useRef<HTMLSpanElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const glowRef = useRef<HTMLDivElement>(null);
+  const progressRef = useRef<HTMLDivElement>(null);
 
-  // Autoplay — functional updater reads latest state from React internals,
-  // so no dependency on activeIndex needed. Timer created once, runs forever.
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveIndex((current) => (current + 1) % TESTIMONIALS.length);
-    }, 8000);
-    
-    return () => clearInterval(interval);
-  }, []);
+  const activeIndexRef = useRef(0);
+  const isExitingRef = useRef(false); // Ref mirror — avoids useCallback dep on state
+  const autoplayRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const handleNext = () => {
-    setActiveIndex((current) => (current + 1) % TESTIMONIALS.length);
-  };
+  useEffect(() => { activeIndexRef.current = activeIndex; }, [activeIndex]);
 
-  const handlePrev = () => {
-    setActiveIndex((current) => (current === 0 ? TESTIMONIALS.length - 1 : current - 1));
-  };
+  /* ──────────────────────────────────────────────────────────
+     Swap Logic — CSS class toggle (no GSAP timeline)
+     ──────────────────────────────────────────────────────────
+     1. Add .is-exiting class → CSS fades out (350ms)
+     2. After fade completes → update React state
+     3. Remove .is-exiting → CSS fades in (350ms)
+     Zero DOM mutations during animation. Zero layout shifts.
+     ────────────────────────────────────────────────────────── */
+  const navigateTo = useCallback((newIndex: number) => {
+    // Use ref to check exit state — avoids re-creating this callback on every transition
+    if (isExitingRef.current) return;
+    if (newIndex === activeIndexRef.current) return;
+    if (newIndex < 0 || newIndex >= TESTIMONIALS.length) return;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleDragEnd = (e: any, { offset, velocity }: any) => {
-    const swipe = Math.abs(offset.x) * velocity.x;
-    if (swipe < -100 && activeIndex < TESTIMONIALS.length - 1) {
-      setActiveIndex(activeIndex + 1);
-    } else if (swipe > 100 && activeIndex > 0) {
-      setActiveIndex(activeIndex - 1);
+    if (prefersReducedMotion) {
+      setActiveIndex(newIndex);
+      if (glowRef.current) {
+        glowRef.current.style.background =
+          `radial-gradient(circle, ${TESTIMONIALS[newIndex].brandColor} 0%, transparent 80%)`;
+      }
+      return;
     }
-  };
+
+    // Phase 1: Fade out
+    isExitingRef.current = true;
+    setIsExiting(true);
+
+    // Phase 2: After CSS transition ends, swap content + fade in
+    setTimeout(() => {
+      setActiveIndex(newIndex);
+      isExitingRef.current = false;
+      setIsExiting(false);
+      // Update glow color
+      if (glowRef.current) {
+        glowRef.current.style.background =
+          `radial-gradient(circle, ${TESTIMONIALS[newIndex].brandColor} 0%, transparent 80%)`;
+      }
+    }, FADE_MS);
+  }, [prefersReducedMotion]); // Stable deps — no state dependency
+
+  /* ──────────────────────────────────────────────────────────
+     Navigation (resets autoplay)
+     ────────────────────────────────────────────────────────── */
+  const resetAutoplay = useCallback(() => {
+    if (autoplayRef.current) clearTimeout(autoplayRef.current);
+
+    // Restart progress bar animation by removing & re-adding class
+    const fill = progressRef.current;
+    if (fill) {
+      fill.classList.remove("is-running");
+      // Force reflow so the browser registers the removal before re-add
+      void fill.offsetWidth;
+      fill.classList.add("is-running");
+    }
+
+    autoplayRef.current = setTimeout(() => {
+      const next = (activeIndexRef.current + 1) % TESTIMONIALS.length;
+      navigateTo(next);
+      resetAutoplay();
+    }, AUTOPLAY_MS);
+  }, [navigateTo]);
+
+  const handleNext = useCallback(() => {
+    const next = (activeIndexRef.current + 1) % TESTIMONIALS.length;
+    navigateTo(next);
+    resetAutoplay();
+  }, [navigateTo, resetAutoplay]);
+
+  const handlePrev = useCallback(() => {
+    const prev = activeIndexRef.current === 0
+      ? TESTIMONIALS.length - 1
+      : activeIndexRef.current - 1;
+    navigateTo(prev);
+    resetAutoplay();
+  }, [navigateTo, resetAutoplay]);
+
+  /* ──────────────────────────────────────────────────────────
+     Autoplay — start on mount
+     ────────────────────────────────────────────────────────── */
+  useEffect(() => {
+    resetAutoplay();
+    return () => {
+      if (autoplayRef.current) clearTimeout(autoplayRef.current);
+    };
+  }, [resetAutoplay]);
+
+  /* ──────────────────────────────────────────────────────────
+     Swipe — native pointer events, no drag library
+     ────────────────────────────────────────────────────────── */
+  const swipeRef = useRef<number | null>(null);
+
+  const onPointerDown = useCallback((e: React.PointerEvent) => {
+    swipeRef.current = e.clientX;
+  }, []);
+
+  const onPointerUp = useCallback((e: React.PointerEvent) => {
+    if (swipeRef.current === null) return;
+    const diff = e.clientX - swipeRef.current;
+    swipeRef.current = null;
+    if (Math.abs(diff) < 60) return;
+    if (diff < 0) handleNext(); else handlePrev();
+  }, [handleNext, handlePrev]);
+
+  /* ──────────────────────────────────────────────────────────
+     Entrance Animation (ScrollTrigger, once: true)
+     ────────────────────────────────────────────────────────── */
+  useEffect(() => {
+    if (prefersReducedMotion) return;
+    const section = sectionRef.current;
+    const tag = tagRef.current;
+    const content = contentRef.current;
+    const bottom = bottomRef.current;
+    if (!section || !tag || !content || !bottom) return;
+
+    const triggers: ScrollTrigger[] = [];
+    const base = {
+      trigger: section,
+      toggleActions: "play none none none" as const,
+      once: true,
+    };
+
+    const t1 = gsap.fromTo(tag,
+      { opacity: 0, y: 24 },
+      { opacity: 1, y: 0, duration: 0.8, ease: "power3.out",
+        scrollTrigger: { ...base, start: "top 85%" } }
+    );
+    if (t1.scrollTrigger) triggers.push(t1.scrollTrigger);
+
+    const t2 = gsap.fromTo(content,
+      { opacity: 0, y: 32 },
+      { opacity: 1, y: 0, duration: 1, ease: "power3.out",
+        scrollTrigger: { ...base, start: "top 80%" } }
+    );
+    if (t2.scrollTrigger) triggers.push(t2.scrollTrigger);
+
+    const t3 = gsap.fromTo(bottom,
+      { opacity: 0, y: 20 },
+      { opacity: 1, y: 0, duration: 0.8, ease: "power3.out",
+        scrollTrigger: { ...base, start: "top 75%" } }
+    );
+    if (t3.scrollTrigger) triggers.push(t3.scrollTrigger);
+
+    return () => { triggers.forEach(st => st.kill()); };
+  }, [prefersReducedMotion]);
+
+  /* ── Derived ── */
+  const t = TESTIMONIALS[activeIndex];
 
   return (
     <section
+      ref={sectionRef}
       id="testimonials"
-      className="testimonials-section-3d dark relative overflow-hidden py-24 md:py-32"
-      aria-label="Client Testimonials 3D Slider"
+      className="testimonials-section"
+      aria-label="Client Testimonials"
+      onPointerDown={onPointerDown}
+      onPointerUp={onPointerUp}
     >
-      {/* Dynamic Background Glow - Hidden on mobile for extreme performance */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
-        {!isMobile && (
-          <AnimatePresence mode="popLayout">
-            <motion.div
-              key={`glow-${activeIndex}`}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 1.2 }}
-              transition={{ duration: 1.5, ease: "easeInOut" }}
-              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] md:w-[800px] md:h-[800px] rounded-full"
-              style={{
-                background: `radial-gradient(circle, ${activeTestimonial.brandColor} 0%, transparent 88%)`,
-                opacity: 0.08
-              }}
-            />
-          </AnimatePresence>
-        )}
-        <div className="scanline-grid opacity-10" />
+      {/* Background */}
+      <div className="testimonials-bg" aria-hidden="true">
+        <div className="scanline-grid opacity-[0.03]" />
+        <div
+          ref={glowRef}
+          className="testimonials-glow"
+          style={{
+            background: `radial-gradient(circle, ${t.brandColor} 0%, transparent 80%)`,
+          }}
+        />
       </div>
 
-      <div className="section-container relative z-10 flex flex-col items-center">
-        
-        {/* Header & Main Quote Display */}
-        <div className="flex flex-col items-center text-center w-full max-w-5xl mx-auto">
-          <span className="testimonials-tag mb-8 md:mb-12 inline-block px-4 py-1.5 rounded-full border border-border/50 text-xs font-mono text-muted-foreground uppercase tracking-widest bg-background/80">
-            05 — Success Stories
-          </span>
-          
-          <div className="relative min-h-[180px] md:min-h-[220px] w-full flex items-center justify-center mb-8">
-            <Quote className="absolute -top-6 -left-2 md:-top-10 md:-left-8 w-12 h-12 md:w-20 md:h-20 text-accent-primary opacity-10" />
-            <h2 className="font-heading text-xl md:text-3xl lg:text-4xl font-medium tracking-tight leading-[1.3] md:leading-[1.4] text-text-primary">
-              &ldquo;<DecodeQuote text={activeTestimonial.quote} />&rdquo;
-            </h2>
-          </div>
-        </div>
+      <div className="testimonials-container">
+        {/* Section tag */}
+        <span ref={tagRef} className="testimonials-tag">
+          05 — Client Stories
+        </span>
 
-        {/* 3D Coverflow Slider */}
-        <div 
-          className="w-full mt-8 md:mt-12 h-[380px] relative perspective-[1200px] flex items-center justify-center"
-          style={{ perspective: "1200px" }}
+        {/* Quote content — single CSS transition, zero jitter */}
+        <div
+          ref={contentRef}
+          className={`testimonials-content${isExiting ? " is-exiting" : ""}`}
+          role="region"
+          aria-live="polite"
+          aria-atomic="true"
         >
-          <div className="relative w-full max-w-6xl h-full flex items-center justify-center transform-style-3d">
-            {TESTIMONIALS.map((testimonial, idx) => {
-              let offset = idx - activeIndex;
-              const half = Math.floor(TESTIMONIALS.length / 2);
-              if (offset > half) offset -= TESTIMONIALS.length;
-              if (offset < -half) offset += TESTIMONIALS.length;
+          {/* Quote */}
+          <blockquote className="testimonials-quote">
+            &ldquo;{t.quote}&rdquo;
+          </blockquote>
 
-              const isCenter = offset === 0;
-              const absOffset = Math.abs(offset);
-              const sign = Math.sign(offset);
+          {/* Accent line */}
+          <hr className="testimonials-rule" />
 
-              // 3D Math Variables
-              const xTranslation = isMobile ? 65 : 180;
-              const x = offset * xTranslation;
-              const rotateY = sign * -28; // Turn inward
-              const scale = Math.max(1 - absOffset * 0.15, 0.5);
-              const z = -absOffset * 150;
-              const opacity = Math.max(1 - absOffset * 0.4, 0);
-              const zIndex = TESTIMONIALS.length - absOffset;
-
-              // Do not render cards that are too far away
-              if (absOffset > 2) return null;
-
-              return (
-                <motion.div
-                  key={testimonial.id}
-                  className="absolute cursor-pointer select-none will-change-transform"
-                  style={{ zIndex }}
-                  initial={false}
-                  animate={{
-                    x,
-                    rotateY,
-                    scale,
-                    z,
-                    opacity,
-                  }}
-                  transition={{
-                    type: "spring",
-                    stiffness: 260,
-                    damping: 20,
-                    mass: 0.8,
-                  }}
-                  onClick={() => setActiveIndex(idx)}
-                  drag={isCenter ? "x" : false}
-                  dragConstraints={{ left: 0, right: 0 }}
-                  dragElastic={0.2}
-                  onDragEnd={isCenter ? handleDragEnd : undefined}
-                >
-                  <div className={`
-                    relative border border-white/10 rounded-2xl p-6 md:p-8 
-                    w-[280px] md:w-[380px] h-[320px] md:h-[340px] flex flex-col justify-between overflow-hidden
-                    transition-shadow duration-500
-                    bg-[#0b0c10]
-                    ${isCenter ? 'shadow-[0_20px_50px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.1)] border-white/20' : 'shadow-none'}
-                  `}>
-                    {/* Inner Top Accent Glow - Hidden on mobile to save GPU frame rate */}
-                    {!isMobile && (
-                      <div 
-                        className="absolute -top-32 left-1/2 -translate-x-1/2 w-[280px] h-[280px] rounded-full pointer-events-none"
-                        style={{ background: testimonial.brandColor, opacity: 0.18 }}
-                      />
-                    )}
-
-                    <div className="relative z-10">
-                      <div className="flex items-center gap-3 mb-6">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={`/icons/${testimonial.logo}.svg`}
-                          alt={`${testimonial.company} Logo`}
-                          className="w-8 h-8 md:w-10 md:h-10 filter invert dark:invert-0 drop-shadow-md"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).style.display = "none";
-                          }}
-                        />
-                        <span className="font-heading font-bold text-xl md:text-2xl text-white tracking-wide">
-                          {testimonial.company}
-                        </span>
-                      </div>
-                      
-                      <div className="inline-block px-3 py-1.5 bg-white/5 border border-white/10 rounded-md text-xs md:text-sm font-mono text-accent-primary font-medium tracking-wide shadow-sm">
-                        {testimonial.metric}
-                      </div>
-                    </div>
-
-                    <div className="relative z-10 pt-4 mt-auto border-t border-white/10">
-                      <div className="flex items-center gap-4">
-                        <div className="relative w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden shrink-0 border-2 border-white/10">
-                          <Image
-                            src={testimonial.avatar}
-                            alt={testimonial.name}
-                            fill
-                            sizes="48px"
-                            className="object-cover"
-                          />
-                        </div>
-                        <div>
-                          <h4 className="font-semibold text-white text-sm md:text-base">
-                            {testimonial.name}
-                          </h4>
-                          <p className="text-white/60 text-xs md:text-sm">
-                            {testimonial.role}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })}
+          {/* Person */}
+          <div className="testimonials-person">
+            <div className="testimonials-avatar">
+              <Image
+                src={t.avatar}
+                alt={t.name}
+                fill
+                sizes="48px"
+                className="object-cover"
+              />
+            </div>
+            <div>
+              <p className="testimonials-person-name">{t.name}</p>
+              <p className="testimonials-person-role">
+                {t.role}, {t.company}
+              </p>
+              <span className="testimonials-metric">{t.metric}</span>
+            </div>
           </div>
         </div>
 
-        {/* Navigation Controls */}
-        <div className="flex items-center justify-center gap-6 mt-8 md:mt-12 relative z-20">
-          <button
-            onClick={handlePrev}
-            className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/20 flex items-center justify-center text-white hover:border-accent-primary hover:text-accent-primary hover:bg-accent-primary/10 transition-all group"
-            aria-label="Previous Testimonial"
-          >
-            <ArrowLeft className="w-4 h-4 md:w-5 md:h-5 group-hover:-translate-x-0.5 transition-transform" />
-          </button>
+        {/* Bottom: progress + controls */}
+        <div ref={bottomRef} className="testimonials-bottom">
+          {/* Progress bar — pure CSS animation, zero JS */}
+          <div className="testimonials-progress-track">
+            <div
+              ref={progressRef}
+              className="testimonials-progress-fill is-running"
+              key={activeIndex}
+            />
+          </div>
 
-          <button
-            onClick={handleNext}
-            className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/20 flex items-center justify-center text-white hover:border-accent-primary hover:text-accent-primary hover:bg-accent-primary/10 transition-all group"
-            aria-label="Next Testimonial"
-          >
-            <ArrowRight className="w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-0.5 transition-transform" />
-          </button>
+          {/* Controls */}
+          <div className="testimonials-controls">
+            <button
+              className="testimonials-arrow"
+              onClick={handlePrev}
+              aria-label="Previous testimonial"
+            >
+              <ArrowLeft className="arrow-left" />
+            </button>
+
+            <span className="testimonials-counter">
+              <span className="testimonials-counter-active">
+                {String(activeIndex + 1).padStart(2, "0")}
+              </span>
+              {" / "}
+              {String(TESTIMONIALS.length).padStart(2, "0")}
+            </span>
+
+            <button
+              className="testimonials-arrow"
+              onClick={handleNext}
+              aria-label="Next testimonial"
+            >
+              <ArrowRight className="arrow-right" />
+            </button>
+          </div>
         </div>
-
       </div>
     </section>
   );

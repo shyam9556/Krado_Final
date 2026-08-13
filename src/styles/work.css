@@ -90,6 +90,17 @@
   animation: laptop-website-scroll 24s ease-in-out infinite;
 }
 
+/* Desktop monitors — faster scroll (10s) for taller images in 16:9 frame */
+@keyframes desktop-website-scroll {
+  0%, 8% { transform: translateY(0); }
+  46%, 54% { transform: translateY(calc(-100% + 100cqh)); }
+  92%, 100% { transform: translateY(0); }
+}
+
+.animate-desktop-scroll {
+  animation: desktop-website-scroll 10s ease-in-out infinite;
+}
+
 /* Ã¢â€â‚¬Ã¢â€â‚¬ Ghost index number (behind everything) Ã¢â€â‚¬Ã¢â€â‚¬ */
 .work-ghost-index {
   position: absolute;
@@ -114,18 +125,6 @@
   overflow: hidden;
 }
 
-@keyframes auto-scroll-tour {
-  0% { object-position: 50% 0%; }
-  10% { object-position: 50% 0%; }
-  45% { object-position: 50% 100%; }
-  55% { object-position: 50% 100%; }
-  90% { object-position: 50% 0%; }
-  100% { object-position: 50% 0%; }
-}
-
-.animate-video-tour {
-  animation: auto-scroll-tour 24s ease-in-out infinite;
-}
 
 .work-panel-image {
   object-fit: cover;
@@ -872,8 +871,9 @@
   animation-play-state: paused;
 }
 
-/* Laptop website scroll — only animate on the visible panel */
-.work-panel:not(.is-active) .animate-website-scroll {
+/* Laptop/Desktop website scroll — only animate on the visible panel */
+.work-panel:not(.is-active) .animate-website-scroll,
+.work-panel:not(.is-active) .animate-desktop-scroll {
   animation-play-state: paused;
 }
 
@@ -928,11 +928,13 @@
   /* Radial fade so grid disappears toward edges */
   -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 80%);
           mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 80%);
-  /* 3D perspective Ã¢â‚¬â€ GSAP will rotate this */
+  /* 3D perspective — GSAP will rotate this */
   transform-style: preserve-3d;
+  /* Isolate repaints from mouse-following gradient */
+  contain: layout style paint;
 }
 
-/* Ã¢â€â‚¬Ã¢â€â‚¬ Active Glow Grid that follows the mouse Ã¢â€â‚¬Ã¢â€â‚¬ */
+/* ── Active Glow Grid that follows the mouse ── */
 .work-panel-mesh::before {
   content: "";
   position: absolute;
@@ -1049,3 +1051,85 @@
 }
 
 /* end work section */
+
+/* ==========================================================
+   LIGHT MODE OVERRIDES
+   ========================================================== */
+
+/* Ghost index — dark alpha instead of white alpha */
+:root:not(.dark) .work-ghost-index {
+  color: rgba(0, 0, 0, 0.04);
+}
+
+/* Tag chip border */
+:root:not(.dark) .work-tag-chip {
+  border-color: var(--border);
+}
+
+/* Progress track background */
+:root:not(.dark) .work-progress-track {
+  background: var(--border);
+}
+
+/* Dot navigation — dark alpha */
+:root:not(.dark) .work-dot-inner {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+:root:not(.dark) .work-dot-btn:hover .work-dot-inner {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+/* Active dot keeps its orange — no override needed */
+
+/* Chapter separator — dark alpha */
+:root:not(.dark) .work-chapter-sep {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* Mobile ghost index — dark alpha */
+:root:not(.dark) .work-mobile-ghost-index {
+  color: rgba(0, 0, 0, 0.04);
+}
+
+/* Panel mesh grid — dark lines on light bg */
+:root:not(.dark) .work-panel-mesh {
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+}
+
+/* Closing link hover text — theme-aware */
+:root:not(.dark) .work-closing-link:hover .work-closing-link-inner {
+  color: var(--background);
+}
+
+/* Closing link hover glow — tone down for light */
+:root:not(.dark) .work-closing-link:hover {
+  box-shadow: inset 0 0 0 1px #FF5500, 0 0 16px rgba(255, 85, 0, 0.12);
+}
+
+/* Active tag chip hover glow — reduce for light */
+:root:not(.dark) .is-active .work-tag-chip:hover {
+  box-shadow: 0 0 10px rgba(255, 85, 0, 0.2);
+}
+
+/* Active dot glow — reduce for light */
+:root:not(.dark) .work-dot-btn.active .work-dot-inner {
+  box-shadow: 0 0 8px rgba(255, 85, 0, 0.3);
+}
+
+/* Float icon images — dark instead of white */
+:root:not(.dark) .work-float-icon-inner img {
+  filter: brightness(0);
+}
+
+/* Tooltip — lighter bg in light mode */
+:root:not(.dark) .work-tag-tooltip {
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(255, 85, 0, 0.2);
+}
+
+:root:not(.dark) .work-tag-tooltip span {
+  color: rgba(0, 0, 0, 0.85);
+}

@@ -30,7 +30,7 @@ export function Footer() {
   };
 
   return (
-    <footer id="footer" className="footer-section dark" aria-label="Krado Footer">
+    <footer id="footer" className="footer-section" aria-label="Krado Footer">
       {/* Background glow structures */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         <div className="scanline-grid opacity-[0.02] absolute inset-0" />

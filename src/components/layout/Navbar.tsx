@@ -147,8 +147,7 @@ export function Navbar() {
           style={{ 
             opacity: scrolled ? 1 : 0,
             background: "var(--surface-glass)",
-            boxShadow: "inset 0 -1px 0 rgba(255,255,255,0.06)",
-            borderBottom: "none"
+            borderBottom: "1px solid var(--border)"
           }}
           aria-hidden="true"
         />
@@ -202,13 +201,13 @@ export function Navbar() {
             <Magnetic strength={0.25}>
               <a 
                 href="#contact" 
-                className="hidden md:flex items-center gap-2 group relative overflow-hidden bg-transparent border border-border px-6 py-2.5 text-sm font-medium text-foreground transition-all duration-300 hover:border-accent-primary"
+                className="hidden md:flex items-center gap-2 group relative overflow-hidden bg-transparent border border-border px-6 py-2.5 text-sm font-medium text-foreground transition-[border-color] duration-300 hover:border-accent-primary"
                 style={{ borderRadius: "2px" }} // Sharp corners
               >
                 <div className="absolute inset-0 bg-accent-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 <div className="absolute left-0 bottom-0 w-full h-[2px] bg-accent-primary transform scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500 ease-out" />
                 <span className="relative z-10 transition-transform duration-300 group-hover:-translate-x-1">Start a Project</span>
-                <span className="relative z-10 opacity-0 -ml-4 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300 ease-out text-accent-primary">→</span>
+                <span className="relative z-10 opacity-0 -ml-4 group-hover:opacity-100 group-hover:ml-0 transition-[opacity,margin] duration-300 ease-out text-accent-primary">→</span>
               </a>
             </Magnetic>
 

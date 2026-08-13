@@ -134,7 +134,7 @@ export function MobileNav({
         >
           {/* Backdrop */}
           <motion.div
-            className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             variants={overlayVariants}
             initial="hidden"
             animate="visible"
@@ -187,7 +187,7 @@ export function MobileNav({
               <motion.div variants={linkVariants} className="mt-12 flex flex-col gap-6">
                 <a
                   href="#contact"
-                  className="inline-flex items-center justify-center bg-accent-primary text-background font-bold py-4 px-8 rounded-sm hover:bg-accent-secondary transition-colors"
+                  className="inline-flex items-center justify-center bg-accent-primary text-white font-bold py-4 px-8 rounded-sm hover:bg-accent-secondary transition-colors"
                   onClick={onClose}
                 >
                   Start a Project

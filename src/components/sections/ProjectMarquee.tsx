@@ -36,7 +36,7 @@ const ROW_TWO = PROJECTS.slice(5);
    MarqueeTile reads this to decide if we're actively scrolling.
    Using a module-level variable avoids prop drilling and ref objects. */
 let _lastScrollTime = 0;
-const SCROLL_IDLE_MS = 150;
+const SCROLL_IDLE_MS = 300;
 
 function isActivelyScrolling(): boolean {
   return performance.now() - _lastScrollTime < SCROLL_IDLE_MS;
@@ -70,21 +70,19 @@ const MarqueeTile = memo(function MarqueeTile({ project }: { project: Project })
     if (isActivelyScrolling()) return; // Block new video load during scroll
     const vid = videoRef.current;
     if (!vid) return;
-    vid.src = videoSrc;
+    // Only set src if not already loaded — avoids redundant network fetch
+    if (!vid.src || vid.src === window.location.href) {
+      vid.src = videoSrc;
+    }
     vid.play().catch(() => {});
   }, []);
 
-  // Pause + conditionally release — during scroll, only pause (cheap).
-  // Full teardown (removeAttribute + load) only when NOT scrolling.
+  // Pause only — no teardown. vid.load() triggers the full media pipeline
+  // and causes a CPU spike on every mouse leave. Just pausing is ~0.1ms.
   const handleMouseLeave = useCallback(() => {
     const vid = videoRef.current;
     if (!vid) return;
-    vid.pause(); // Always pause — ~0.1ms, no spike
-    if (!isActivelyScrolling()) {
-      // Full teardown only when not scrolling
-      vid.removeAttribute("src");
-      vid.load();
-    }
+    vid.pause();
   }, []);
 
   // Local asset paths — image field is the basename
@@ -105,7 +103,6 @@ const MarqueeTile = memo(function MarqueeTile({ project }: { project: Project })
         src={posterSrc}
         alt={project.name}
         className="absolute inset-0 h-full w-full object-cover"
-        loading="lazy"
         decoding="async"
         fetchPriority="low"
       />
@@ -121,7 +118,7 @@ const MarqueeTile = memo(function MarqueeTile({ project }: { project: Project })
       />
 
       {/* ── Layer 3: Decorative gradient overlay ── */}
-      <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-[#07090f]/50 via-transparent to-white/4" />
+      <div className="pointer-events-none absolute inset-0 z-10 project-marquee-gradient" />
 
       {/* ── Layer 4: Hover info overlay ── */}
       <div className="project-marquee-overlay">
@@ -184,10 +181,7 @@ export function ProjectMarquee() {
           trigger: section,
           start: "top bottom",
           end: "bottom top",
-          scrub: true,
-          /* Record timestamp on each scroll frame — MarqueeTile
-             checks this to decide if we're actively scrolling.
-             Zero allocations, zero GC pressure. */
+          scrub: 1.5,
           onUpdate: () => {
             _lastScrollTime = performance.now();
           },
@@ -207,7 +201,7 @@ export function ProjectMarquee() {
           trigger: section,
           start: "top bottom",
           end: "bottom top",
-          scrub: true,
+          scrub: 1.5,
         },
       }
     );
@@ -223,7 +217,7 @@ export function ProjectMarquee() {
     <div
       ref={sectionRef}
       id="project-marquee-showcase"
-      className="relative overflow-hidden bg-[#07090f] pb-12 pt-24 text-[#d7e2ea] sm:pb-14 sm:pt-28 lg:pb-16 lg:pt-32 w-full"
+      className="relative overflow-hidden bg-background pb-12 pt-24 text-foreground sm:pb-14 sm:pt-28 lg:pb-16 lg:pt-32 w-full"
       aria-label="Project showcase marquee"
     >
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">

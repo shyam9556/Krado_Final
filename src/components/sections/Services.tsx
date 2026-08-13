@@ -272,7 +272,7 @@ export function Services() {
     <section
       ref={sectionRef}
       id="services"
-      className="services-section dark"
+      className="services-section"
       aria-label="Services"
     >
       {/* ── Background textures ── */}

@@ -602,7 +602,7 @@ export function About() {
     <section
       ref={sectionRef}
       id="about"
-      className="about-section dark"
+      className="about-section"
       aria-label="About Us"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}

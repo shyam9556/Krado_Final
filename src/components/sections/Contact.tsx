@@ -68,7 +68,7 @@ export function Contact() {
   };
 
   return (
-    <section id="contact" className="contact-section dark" aria-label="Start Your Project">
+    <section id="contact" className="contact-section" aria-label="Start Your Project">
       {/* Background radial overlays */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         <div className="scanline-grid opacity-[0.02] absolute inset-0" />
@@ -96,7 +96,7 @@ export function Contact() {
               <br />
               SOMETHING
               <br />
-              <span className="text-accent-primary drop-shadow-[0_0_15px_rgba(255,85,0,0.25)]">
+              <span className="text-accent-primary dark:drop-shadow-[0_0_15px_rgba(255,85,0,0.25)]">
                 BEYOND
               </span>
             </h2>
@@ -277,7 +277,7 @@ export function Contact() {
                     className="form-success-alert mt-4"
                   >
                     <Check className="w-4 h-4 text-green-500" />
-                    <span className="text-sm text-green-400 font-mono">
+                    <span className="text-sm text-green-600 dark:text-green-400 font-mono">
                       Thank you! We have received your project details and will follow up in 24 hours.
                     </span>
                   </motion.div>

@@ -139,13 +139,13 @@ export function DecodeIntro() {
               className="intro-laser absolute top-1/2 left-0 w-full h-[2px] origin-left -translate-y-1/2 opacity-80 z-10"
               style={{ 
                 background: "var(--accent-primary)",
-                boxShadow: "0 0 10px var(--accent-primary), 0 0 20px var(--accent-primary)",
+                boxShadow: "0 0 10px var(--accent-primary)",
                 transform: "scaleX(0)"
               }}
             />
           </div>
           
-          <div className="absolute bottom-8 right-8 text-xs font-mono uppercase tracking-widest text-muted-foreground opacity-50">
+          <div className="absolute bottom-8 right-8 text-xs font-mono uppercase tracking-widest text-muted-foreground opacity-70 dark:opacity-50">
             [ INITIALIZING SEQUENCE ]
           </div>
         </motion.div>

@@ -89,7 +89,7 @@ export function Hero() {
     >
       {/* ── Background Textures ── */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-        <div className="scanline-grid opacity-30 dark:opacity-10" />
+        <div className="scanline-grid opacity-10 dark:opacity-30" />
         <div className="light-leak" />
         
         {/* Subtle radial glow — top-left accent */}
@@ -105,7 +105,7 @@ export function Hero() {
       {!prefersReducedMotion && <HeroCanvas />}
 
       {/* ── Vertical Decorative Label ── */}
-      <div className="hidden lg:block absolute right-12 top-1/2 -translate-y-1/2 rotate-90 origin-right text-xs font-mono font-bold tracking-widest text-muted-foreground uppercase opacity-40">
+      <div className="hidden lg:block absolute right-12 top-1/2 -translate-y-1/2 rotate-90 origin-right text-xs font-mono font-bold tracking-widest text-muted-foreground uppercase opacity-60 dark:opacity-40">
         01 — IT Services & Software
       </div>
 
@@ -138,7 +138,7 @@ export function Hero() {
             {/* Accent Line */}
             <div className="overflow-hidden py-2 -my-2">
               <motion.span 
-                className="inline-block text-accent-primary drop-shadow-[0_0_15px_rgba(255,85,0,0.3)]" 
+                className="inline-block text-accent-primary dark:drop-shadow-[0_0_15px_rgba(255,85,0,0.3)]" 
                 variants={wordAnimation}
                 transition={{ delay: 0.2 }}
               >
@@ -179,12 +179,12 @@ export function Hero() {
             <Magnetic strength={0.25}>
               <a 
                 href="#contact" 
-                className="group relative overflow-hidden bg-foreground px-8 py-4 text-sm font-bold text-background transition-all duration-300 inline-flex items-center gap-3 border border-transparent hover:border-accent-primary"
+                className="group relative overflow-hidden bg-foreground px-8 py-4 text-sm font-bold text-background transition-[border-color] duration-300 inline-flex items-center gap-3 border border-transparent hover:border-accent-primary"
                 style={{ borderRadius: "2px" }}
               >
                 <div className="absolute inset-0 bg-accent-primary transform scale-y-0 group-hover:scale-y-100 origin-bottom transition-transform duration-500 ease-[0.76,0,0.24,1]" />
-                <span className="relative z-10 group-hover:text-[#060609] transition-colors duration-300">Start a Project</span>
-                <span className="relative z-10 transform translate-x-0 group-hover:translate-x-1 group-hover:text-[#060609] transition-all duration-300">→</span>
+                <span className="relative z-10 group-hover:text-background transition-colors duration-300">Start a Project</span>
+                <span className="relative z-10 transform translate-x-0 group-hover:translate-x-1 group-hover:text-background transition-[transform,color] duration-300">→</span>
               </a>
             </Magnetic>
             
@@ -213,7 +213,7 @@ export function Hero() {
         aria-hidden="true"
       >
         <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground rotate-90 origin-bottom translate-y-6">Scroll</span>
-        <div className="w-[1px] h-12 bg-border relative overflow-hidden mt-8">
+        <div className="w-[1px] h-12 bg-foreground/20 dark:bg-border relative overflow-hidden mt-8">
           <div className="absolute top-0 left-0 w-full h-1/2 bg-accent-primary animate-[scrollDown_2s_infinite]" />
         </div>
       </div>

@@ -58,12 +58,25 @@ export function SmoothScrollProvider({
     // lagSmoothing(500, 33) was adding interpolation frames that fought Lenis easing.
     gsap.ticker.lagSmoothing(0);
 
-    // Single centralized refresh — replaces the independent refreshes
-    // in Services.tsx and About.tsx. 800ms gives all sections time to mount.
-    const refreshTimer = setTimeout(() => ScrollTrigger.refresh(), 800);
+    // Refresh ScrollTrigger positions AFTER intro completes — not during it.
+    // During intro, body.overflow is "hidden" so measurements are wrong.
+    let refreshTimer: ReturnType<typeof setTimeout> | null = null;
+    const onIntroComplete = () => {
+      // Wait 150ms for Framer Motion curtain exit + layout stabilization
+      refreshTimer = setTimeout(() => ScrollTrigger.refresh(), 150);
+    };
+    window.addEventListener("krado:intro-complete", onIntroComplete, { once: true });
+    // Fallback: if intro already played (session revisit), refresh after 800ms
+    const fallbackTimer = setTimeout(() => {
+      if (sessionStorage.getItem("krado-intro-seen")) {
+        ScrollTrigger.refresh();
+      }
+    }, 800);
 
     return () => {
-      clearTimeout(refreshTimer);
+      if (refreshTimer) clearTimeout(refreshTimer);
+      clearTimeout(fallbackTimer);
+      window.removeEventListener("krado:intro-complete", onIntroComplete);
       gsap.ticker.remove(tickerCallback);
       lenis.destroy();
       setLenisInstance(null);

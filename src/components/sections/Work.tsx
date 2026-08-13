@@ -41,7 +41,7 @@ const PROJECTS: Project[] = [
   { id: "jivraj", index: "03", name: "JIVRAJ CAPITAL",
     description: "Premium investment capital and wealth management dashboard.",
     tags: ["React", "TypeScript", "Python", "Docker", "PostgreSQL"],
-    image: "/jivraj-tall.webp", videoUrl: "/videos/JivrajCapital.mp4", videoTour: true, mockupType: "desktop", imageAlt: "Jivraj Capital financial dashboard", year: "2024", category: "Finance & Investment", url: "https://jivrajcapital.com" },
+    image: "/work-jivraj.webp", imageTall: "/jivraj-tall.webp", videoTour: true, mockupType: "desktop", imageAlt: "Jivraj Capital financial dashboard", year: "2024", category: "Finance & Investment", url: "https://jivrajcapital.com" },
   { id: "hrpl", index: "04", name: "HRPL PRO",
     description: "Data-rich enterprise-scale full ERP system and operations dashboard.",
     tags: ["Vue.js", "Django", "GraphQL", "Redis", "Kubernetes"],
@@ -112,7 +112,7 @@ function FloatingTechIcons({ tags }: { tags: string[] }) {
             >
               {/* fallback if mask fails */}
               <div
-                className="absolute inset-0 bg-white"
+                className="absolute inset-0 bg-foreground"
                 style={{ 
                   maskImage: `url(${maskUrl})`, 
                   WebkitMaskImage: `url(${maskUrl})` 
@@ -146,20 +146,27 @@ function LaptopMockup({ tallImage, shortImage, videoUrl, isVideo, priority }: { 
 
   useEffect(() => {
     const vid = videoRef.current;
-    if (!vid) return;
+    if (!vid || !videoUrl) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) vid.play().catch(() => {});
-        else vid.pause();
+        if (entry.isIntersecting) {
+          // Lazy-load: set src only when visible (avoids pre-allocating decode pipeline)
+          if (!vid.src || vid.src === window.location.href) {
+            vid.src = videoUrl;
+          }
+          vid.play().catch(() => {});
+        } else {
+          vid.pause();
+        }
       },
       { rootMargin: "100px" }
     );
     observer.observe(vid);
     return () => observer.disconnect();
-  }, []);
+  }, [videoUrl]);
 
   return (
-    <div className="relative w-full max-w-4xl mx-auto drop-shadow-2xl work-panel-image group transition-transform duration-700 hover:scale-[1.02]">
+    <div className="relative w-full max-w-4xl mx-auto work-panel-image group transition-transform duration-700 hover:scale-[1.02]">
       {/* Laptop Screen / Lid */}
       <div className="relative bg-[#0d0d0f] rounded-t-xl md:rounded-t-3xl rounded-b-sm p-1.5 md:p-3 lg:p-4 border border-[#2a2a2d] shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]">
         {/* Camera Notch */}
@@ -170,10 +177,10 @@ function LaptopMockup({ tallImage, shortImage, videoUrl, isVideo, priority }: { 
         {/* Screen Content */}
         <div className="relative bg-black rounded-[4px] md:rounded-md overflow-hidden aspect-[16/10] w-full work-laptop-screen">
           {videoUrl ? (
-            <video ref={videoRef} src={videoUrl} loop muted playsInline preload="none" poster={shortImage} className="w-full h-full object-cover group-hover:brightness-75 transition-all duration-500 pointer-events-none" />
+            <video ref={videoRef} loop muted playsInline preload="none" poster={shortImage} className="w-full h-full object-cover group-hover:brightness-75 transition-[filter] duration-500 pointer-events-none" />
           ) : (
             <div className={`w-full absolute inset-x-0 top-0 ${isVideo ? 'animate-website-scroll' : ''}`}>
-               <Image src={isVideo ? tallImage! : shortImage} alt="Website Tour" width={1920} height={4000} sizes="(max-width: 1024px) 100vw, 1024px" quality={75} className="w-full h-auto object-cover group-hover:brightness-75 transition-all duration-500" priority={priority} loading={priority ? "eager" : "lazy"} />
+               <Image src={isVideo ? tallImage! : shortImage} alt="Website Tour" width={1920} height={4000} sizes="(max-width: 1024px) 100vw, 1024px" quality={75} className="w-full h-auto object-cover group-hover:brightness-75 transition-[filter] duration-500" priority={priority} loading={priority ? "eager" : "lazy"} />
             </div>
           )}
           {/* Glossy Reflection */}
@@ -192,34 +199,56 @@ function LaptopMockup({ tallImage, shortImage, videoUrl, isVideo, priority }: { 
 
 /* ════════════════════════════════════════════════════════════
    DESKTOP MONITOR MOCKUP (FOR DASHBOARDS)
+   • videoUrl provided → lazy-loaded video (HRPL)
+   • no videoUrl but isVideo + tallImage → 10s CSS scroll (Jivraj)
+   • otherwise → static image
    ════════════════════════════════════════════════════════════ */
-function DesktopMonitorMockup({ videoUrl, shortImage, priority }: { videoUrl?: string, shortImage?: string, priority?: boolean }) {
+function DesktopMonitorMockup({ videoUrl, shortImage, tallImage, isVideo, priority }: { videoUrl?: string, shortImage?: string, tallImage?: string, isVideo?: boolean, priority?: boolean }) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     const vid = videoRef.current;
-    if (!vid) return;
+    if (!vid || !videoUrl) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) vid.play().catch(() => {});
-        else vid.pause();
+        if (entry.isIntersecting) {
+          if (!vid.src || vid.src === window.location.href) {
+            vid.src = videoUrl;
+          }
+          vid.play().catch(() => {});
+        } else {
+          vid.pause();
+        }
       },
       { rootMargin: "100px" }
     );
     observer.observe(vid);
     return () => observer.disconnect();
-  }, []);
+  }, [videoUrl]);
 
   return (
-    <div className="relative w-full max-w-5xl mx-auto drop-shadow-2xl work-panel-image group transition-transform duration-700 hover:scale-[1.02] flex flex-col items-center mt-2 md:mt-4">
+    <div className="relative w-full max-w-5xl mx-auto work-panel-image group transition-transform duration-700 hover:scale-[1.02] flex flex-col items-center mt-2 md:mt-4">
       {/* Monitor Display / Frame */}
-      <div className="relative bg-[#0d0d0f] rounded-xl md:rounded-2xl p-1.5 md:p-3 lg:p-4 border border-[#2a2a2d] shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_25px_50px_rgba(0,0,0,0.5)] w-full z-10">
+      <div className="relative bg-[#0d0d0f] rounded-xl md:rounded-2xl p-1.5 md:p-3 lg:p-4 border border-[#2a2a2d] shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] w-full z-10">
         {/* Screen Content */}
-        <div className="relative bg-black rounded-[4px] md:rounded-lg overflow-hidden aspect-[16/9] w-full">
+        <div className="relative bg-black rounded-[4px] md:rounded-lg overflow-hidden aspect-[16/9] w-full work-laptop-screen">
           {videoUrl ? (
-            <video ref={videoRef} src={videoUrl} loop muted playsInline preload="none" poster={shortImage} className="w-full h-full object-cover group-hover:brightness-75 transition-all duration-500 pointer-events-none" />
+            /* Video path — src set lazily via IntersectionObserver */
+            <video ref={videoRef} loop muted playsInline preload="none" poster={shortImage}
+              className="w-full h-full object-cover group-hover:brightness-75 transition-[filter] duration-500 pointer-events-none" />
+          ) : isVideo && tallImage ? (
+            /* 10s CSS scroll animation for desktop monitors */
+            <div className="w-full absolute inset-x-0 top-0 animate-desktop-scroll">
+              <Image src={tallImage} alt="Dashboard Tour" width={1920} height={4000}
+                sizes="(max-width: 1024px) 100vw, 1024px" quality={75}
+                className="w-full h-auto object-cover group-hover:brightness-75 transition-[filter] duration-500"
+                priority={priority} loading={priority ? "eager" : "lazy"} />
+            </div>
           ) : (
-            <Image src={shortImage!} alt="Dashboard Tour" fill sizes="(max-width: 1024px) 100vw, 1024px" quality={75} className="w-full h-full object-cover group-hover:brightness-75 transition-all duration-500" priority={priority} />
+            /* Static image fallback */
+            <Image src={shortImage!} alt="Dashboard" fill sizes="(max-width: 1024px) 100vw, 1024px"
+              quality={75} className="w-full h-full object-cover group-hover:brightness-75 transition-[filter] duration-500"
+              priority={priority} />
           )}
           {/* Subtle Screen Bezel Inner Shadow */}
           <div className="absolute inset-0 shadow-[inset_0_0_10px_rgba(0,0,0,0.5)] pointer-events-none" />
@@ -273,13 +302,13 @@ function MobileProjectCard({ project, idx }: { project: Project; idx: number }) 
 
           {project.videoTour ? (
             project.mockupType === "desktop" ? (
-               <DesktopMonitorMockup videoUrl={project.videoUrl} shortImage={project.image} />
+               <DesktopMonitorMockup videoUrl={project.videoUrl} shortImage={project.image} tallImage={project.imageTall} isVideo={project.videoTour} />
             ) : (
                <LaptopMockup isVideo={project.videoTour} tallImage={project.imageTall} shortImage={project.image} videoUrl={project.videoUrl} />
             )
           ) : (
             <>
-              <Image src={project.image} alt={project.imageAlt} fill sizes="(max-width: 768px) 100vw, 50vw" quality={75} className="work-mobile-image group-hover:scale-105 group-hover:brightness-75 transition-all duration-700" priority={idx <= 1} />
+              <Image src={project.image} alt={project.imageAlt} fill sizes="(max-width: 768px) 100vw, 50vw" quality={75} className="work-mobile-image group-hover:scale-105 group-hover:brightness-75 transition-[transform,filter] duration-700" priority={idx <= 1} />
               <div className="work-mobile-image-overlay pointer-events-none" />
             </>
           )}
@@ -301,7 +330,7 @@ function MobileProjectCard({ project, idx }: { project: Project; idx: number }) 
           )}
           {project.videoTour ? (
             project.mockupType === "desktop" ? (
-               <DesktopMonitorMockup videoUrl={project.videoUrl} shortImage={project.image} />
+               <DesktopMonitorMockup videoUrl={project.videoUrl} shortImage={project.image} tallImage={project.imageTall} isVideo={project.videoTour} />
             ) : (
                <LaptopMockup isVideo={project.videoTour} tallImage={project.imageTall} shortImage={project.image} videoUrl={project.videoUrl} />
             )
@@ -409,10 +438,11 @@ export function Work() {
           );
 
           if (prevActiveRef.current !== panelIndex) {
+            const prevIdx = prevActiveRef.current;
             setActiveIndex(panelIndex);
             prevActiveRef.current = panelIndex;
             if (panelIndex < projectPanels.length && !noMotion) {
-              activateProjectPanel(projectPanels, panelIndex);
+              activateProjectPanel(projectPanels, panelIndex, prevIdx);
             }
           }
         },
@@ -444,8 +474,8 @@ export function Work() {
             if (bgGlow)  gsap.to(bgGlow,  { x: x * 400, y: y * 400, duration: 2, ease: "power2.out", overwrite: true });
 
             floatIcons.forEach((icon, i) => {
-              const factor = (i + 1) * 35; // Much stronger parallax shift
-              gsap.to(icon, { x: x * factor, y: y * factor * 0.8, duration: 1.5 + i * 0.2, ease: "power2.out", overwrite: true });
+              const factor = (i + 1) * 35;
+              gsap.set(icon, { x: x * factor, y: y * factor * 0.8 });
             });
             rafId = null;
           });
@@ -456,7 +486,7 @@ export function Work() {
           if (content) gsap.to(content, { rotateY: 0, rotateX: 0, duration: 1.2, ease: "power3.out", overwrite: "auto" });
           if (mesh)    gsap.to(mesh,    { rotateX: 0, rotateY: 0, "--mouse-x": `50%`, "--mouse-y": `50%`, duration: 1.4, ease: "power3.out", overwrite: "auto" });
           if (bgGlow)  gsap.to(bgGlow,  { x: 0, y: 0, duration: 1.8, ease: "power3.out", overwrite: "auto" });
-          floatIcons.forEach(icon => gsap.to(icon, { x: 0, y: 0, duration: 1.5, ease: "power3.out", overwrite: "auto" }));
+          floatIcons.forEach(icon => gsap.to(icon, { x: 0, y: 0, duration: 1.2, ease: "power3.out", overwrite: "auto" }));
         };
 
         panel.addEventListener("mousemove", onMove);
@@ -589,8 +619,12 @@ export function Work() {
 /* ════════════════════════════════════════════════════════════
    PANEL ACTIVATION
    ════════════════════════════════════════════════════════════ */
-function activateProjectPanel(panels: HTMLElement[], activeIdx: number) {
+function activateProjectPanel(panels: HTMLElement[], activeIdx: number, prevIdx: number) {
   panels.forEach((panel, i) => {
+    // Only animate the panel that's entering (activeIdx) and the one leaving (prevIdx)
+    // Skip panels that are already in their correct state — cuts 24 tweens to ~12
+    if (i !== activeIdx && i !== prevIdx) return;
+
     const img = panel.querySelector<HTMLElement>(".work-panel-image");
     const tags = panel.querySelectorAll<HTMLElement>(".work-tag-chip");
     const nameEl = panel.querySelector<HTMLElement>(".work-panel-name");
@@ -652,21 +686,21 @@ function DesktopPanel({ project, isActive }: { project: Project; isActive: boole
 
           {project.videoTour ? (
             project.mockupType === "desktop" ? (
-               <DesktopMonitorMockup videoUrl={project.videoUrl} shortImage={project.image} />
+               <DesktopMonitorMockup videoUrl={project.videoUrl} shortImage={project.image} tallImage={project.imageTall} isVideo={project.videoTour} />
             ) : (
                <LaptopMockup isVideo={project.videoTour} tallImage={project.imageTall} shortImage={project.image} videoUrl={project.videoUrl} priority={project.index <= "02"} />
             )
           ) : (
             <>
               <Image src={project.image} alt={project.imageAlt} fill sizes="55vw" quality={75}
-                className="work-panel-image group-hover:scale-105 group-hover:brightness-50 transition-all duration-700" priority={project.index <= "02"} />
+                className="work-panel-image group-hover:scale-105 group-hover:brightness-50 transition-[transform,filter] duration-700" priority={project.index <= "02"} />
               <div className="work-panel-image-fade pointer-events-none" />
               <div className="work-panel-grain pointer-events-none" aria-hidden="true" />
             </>
           )}
           
           <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-30 pointer-events-none">
-            <span className="px-8 py-4 bg-[#1a1a2e]/90 border border-white/20 text-white font-mono uppercase tracking-widest text-sm rounded-full shadow-[0_0_40px_rgba(255,255,255,0.15)] flex items-center gap-3 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500">
+            <span className="px-8 py-4 bg-[#1a1a2e]/90 border border-white/20 text-white font-mono uppercase tracking-widest text-sm rounded-full shadow-[0_0_40px_rgba(255,255,255,0.15)] flex items-center gap-3 transform translate-y-4 group-hover:translate-y-0 transition-[opacity,transform] duration-500">
               Visit Live Site
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
             </span>
@@ -682,7 +716,7 @@ function DesktopPanel({ project, isActive }: { project: Project; isActive: boole
           )}
           {project.videoTour ? (
             project.mockupType === "desktop" ? (
-               <DesktopMonitorMockup videoUrl={project.videoUrl} shortImage={project.image} />
+               <DesktopMonitorMockup videoUrl={project.videoUrl} shortImage={project.image} tallImage={project.imageTall} isVideo={project.videoTour} />
             ) : (
                <LaptopMockup isVideo={project.videoTour} tallImage={project.imageTall} shortImage={project.image} videoUrl={project.videoUrl} priority={project.index <= "02"} />
             )

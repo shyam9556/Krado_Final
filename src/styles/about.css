@@ -860,7 +860,7 @@
 
   .about-cta__button:hover .about-cta__text,
   .about-cta__button:hover .about-cta__arrow {
-    color: #060609;
+    color: var(--background);
   }
 
   .about-cta__arrow {
@@ -912,7 +912,98 @@
   }
 
   /* ==========================================================
-     REDUCED MOTION Ã¢â‚¬â€ disable CSS transitions & animations
+     LIGHT MODE OVERRIDES
+     ========================================================== */
+
+  :root:not(.dark) .about-manifesto__accent {
+    text-shadow: none;
+  }
+
+  :root:not(.dark) .about-manifesto__accent:hover {
+    text-shadow: none;
+  }
+
+  :root:not(.dark) .about-manifesto__accent::after {
+    box-shadow: none;
+  }
+
+  :root:not(.dark) .about-manifesto__line:hover {
+    text-shadow: none;
+  }
+
+  :root:not(.dark) .about-manifesto__line::after {
+    box-shadow: none;
+  }
+
+  /* Bento cards */
+  :root:not(.dark) .about-value-card {
+    background: rgba(0, 0, 0, 0.02);
+    border-color: var(--border);
+  }
+
+  :root:not(.dark) .about-value-card.is-hovered,
+  :root:not(.dark) .about-value-card:hover {
+    background: rgba(255, 85, 0, 0.04);
+    border-color: rgba(255, 85, 0, 0.25);
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.06),
+      0 0 1px rgba(255, 85, 0, 0.15);
+  }
+
+  /* Shimmer sweep */
+  :root:not(.dark) .about-value-card::before {
+    background: linear-gradient(
+      100deg,
+      transparent 0%,
+      rgba(0, 0, 0, 0.03) 45%,
+      rgba(0, 0, 0, 0.05) 50%,
+      rgba(0, 0, 0, 0.03) 55%,
+      transparent 100%
+    );
+  }
+
+  /* Ghost index */
+  :root:not(.dark) .about-value-card__ghost-index {
+    color: rgba(0, 0, 0, 0.04);
+  }
+
+  :root:not(.dark) .about-value-card.is-hovered .about-value-card__ghost-index,
+  :root:not(.dark) .about-value-card:hover .about-value-card__ghost-index {
+    color: rgba(255, 85, 0, 0.12);
+  }
+
+  /* Stat dot hover glow */
+  :root:not(.dark) .about-stat:hover .about-stat__accent-dot {
+    box-shadow: 0 0 8px rgba(255, 85, 0, 0.25),
+      0 0 16px rgba(255, 85, 0, 0.08);
+  }
+
+  /* Stat number hover */
+  :root:not(.dark) .about-stat:hover .about-stat__number {
+    filter: brightness(1.05);
+  }
+
+  /* Marquee reverse track border */
+  :root:not(.dark) .about-marquee__track--reverse {
+    border-top-color: var(--border);
+  }
+
+  /* Marquee item hover — no glow */
+  :root:not(.dark) .about-marquee__item:hover {
+    text-shadow: none;
+  }
+
+  :root:not(.dark) .about-marquee__item:hover .about-marquee__dot {
+    text-shadow: none;
+  }
+
+  /* CTA hover text — design token */
+  :root:not(.dark) .about-cta__button:hover .about-cta__text,
+  :root:not(.dark) .about-cta__button:hover .about-cta__arrow {
+    color: var(--background);
+  }
+
+  /* ==========================================================
+     REDUCED MOTION — disable CSS transitions & animations
      ========================================================== */
 
   @media (prefers-reduced-motion: reduce) {

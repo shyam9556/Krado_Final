@@ -464,3 +464,50 @@
     color: var(--accent-primary);
   }
 
+  /* ==========================================================
+     LIGHT MODE OVERRIDES
+     ========================================================== */
+
+  /* Heading accent — no neon bloom on light bg */
+  :root:not(.dark) .services-heading__accent {
+    text-shadow: none;
+  }
+
+  /* Sweep line — softer glow on light */
+  :root:not(.dark) .services-row__sweep {
+    box-shadow: 0 0 8px rgba(255, 85, 0, 0.15);
+  }
+
+  /* Ghost index — invert stroke for dark lines on light bg */
+  :root:not(.dark) .services-row__ghost-index {
+    -webkit-text-stroke-color: rgba(0, 0, 0, 0.06);
+  }
+
+  :root:not(.dark) .services-row.is-active .services-row__ghost-index {
+    -webkit-text-stroke-color: rgba(255, 85, 0, 0.12);
+  }
+
+  /* Active index — no neon text-shadow */
+  :root:not(.dark) .services-row.is-active .services-row__index {
+    text-shadow: none;
+  }
+
+  /* Active title — no neon bloom */
+  :root:not(.dark) .services-row.is-active .services-row__title {
+    text-shadow: none;
+  }
+
+  /* Active icon — no neon glow */
+  :root:not(.dark) .services-row.is-active .services-row__icon {
+    text-shadow: none;
+  }
+
+  /* Active row glow — appropriate intensity for light bg */
+  :root:not(.dark) .services-row__glow {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 85, 0, 0.04) 0%,
+      rgba(255, 85, 0, 0.015) 50%,
+      transparent 100%
+    );
+  }

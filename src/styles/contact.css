@@ -1,12 +1,12 @@
-﻿/* ============================================================
+/* ============================================================
    CONTACT / START A PROJECT SECTION
    ============================================================ */
 .contact-section {
   position: relative;
-  background-color: #050508;
+  background-color: var(--background);
   overflow: hidden;
   padding: 6rem 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.03);
+  border-top: 1px solid var(--border);
 }
 
 @media (min-width: 1024px) {
@@ -70,7 +70,7 @@
   font-weight: 600;
   letter-spacing: 0.25em;
   text-transform: uppercase;
-  color: #a6b0bc;
+  color: var(--text-muted);
   margin-bottom: 1.5rem;
 }
 
@@ -81,14 +81,14 @@
   line-height: 0.95;
   text-transform: uppercase;
   letter-spacing: -0.04em;
-  color: #fff;
+  color: var(--text-primary);
   margin-bottom: 2rem;
 }
 
 .contact-desc {
   font-size: 1rem;
   line-height: 1.7;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-secondary);
   margin-bottom: 3.5rem;
   max-width: 28rem;
 }
@@ -97,7 +97,7 @@
   display: flex;
   flex-direction: column;
   gap: 2.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid var(--border);
   padding-top: 2.5rem;
 }
 
@@ -113,7 +113,7 @@
   font-size: 0.65rem;
   font-weight: 600;
   letter-spacing: 0.15em;
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--text-muted);
   text-transform: uppercase;
 }
 
@@ -121,7 +121,7 @@
   font-family: var(--font-mono);
   font-size: 1.5rem;
   font-weight: 500;
-  color: #fff;
+  color: var(--text-primary);
   letter-spacing: -0.02em;
 }
 
@@ -135,7 +135,7 @@
   font-family: var(--font-heading);
   font-size: 1.75rem;
   font-weight: 500;
-  color: #fff;
+  color: var(--text-primary);
   letter-spacing: -0.02em;
   display: inline-flex;
   align-items: center;
@@ -204,7 +204,7 @@
   font-family: var(--font-heading);
   font-size: 1.1rem;
   font-weight: 500;
-  color: #fff;
+  color: var(--text-primary);
   letter-spacing: -0.01em;
 }
 
@@ -222,9 +222,9 @@
   font-family: var(--font-sans);
   font-size: 0.85rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-muted);
   background-color: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
   border-radius: 9999px;
   cursor: pointer;
   overflow: hidden;
@@ -244,8 +244,8 @@
 
 .form-service-chip:hover,
 .form-budget-chip:hover {
-  color: #fff;
-  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--text-primary);
+  border-color: rgba(255, 85, 0, 0.25);
 }
 
 .form-service-chip.is-selected,
@@ -289,7 +289,7 @@
   left: 0;
   font-family: var(--font-sans);
   font-size: 0.95rem;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-muted);
   pointer-events: none;
   transform-origin: left top;
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), color 0.3s ease;
@@ -305,11 +305,11 @@
   width: 100%;
   background: transparent;
   border: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--border);
   padding: 0.5rem 0;
   font-family: var(--font-sans);
   font-size: 1rem;
-  color: #fff;
+  color: var(--text-primary);
   outline: none;
   transition: border-color 0.3s ease;
 }
@@ -347,8 +347,8 @@
   font-family: var(--font-sans);
   font-size: 0.95rem;
   font-weight: 600;
-  color: #000;
-  background-color: #fff;
+  color: var(--background);
+  background-color: var(--foreground);
   border: none;
   border-radius: 9999px;
   cursor: pointer;
@@ -453,4 +453,20 @@
     transform: none;
     text-shadow: none;
   }
+}
+
+/* ==========================================================
+   LIGHT MODE OVERRIDES
+   ========================================================== */
+
+/* Selected chip — no neon box-shadow on light */
+:root:not(.dark) .form-service-chip.is-selected,
+:root:not(.dark) .form-budget-chip.is-selected {
+  box-shadow: 0 0 12px rgba(255, 85, 0, 0.06);
+}
+
+/* Submit spinner — dark on light bg */
+:root:not(.dark) .form-submit-spinner {
+  border-color: rgba(0, 0, 0, 0.15);
+  border-top-color: var(--foreground);
 }

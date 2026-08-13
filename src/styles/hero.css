@@ -56,3 +56,10 @@
       display: none;
     }
   }
+
+  /* Intro laser — dark mode restores full double neon bloom */
+  .dark .intro-laser {
+    box-shadow:
+      0 0 10px var(--accent-primary),
+      0 0 20px var(--accent-primary) !important;
+  }

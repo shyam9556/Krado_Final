@@ -1,14 +1,14 @@
-﻿/* ============================================================
+/* ============================================================
    PREMIUM FOOTER SECTION
    ============================================================ */
 .footer-section {
   position: relative;
   width: 100%;
-  background-color: #050508;
-  color: #d7e2ea;
+  background-color: var(--background);
+  color: var(--text-secondary);
   padding: 8rem 1.5rem 4rem;
   overflow: hidden;
-  border-top: 1px solid rgba(255, 255, 255, 0.03);
+  border-top: 1px solid var(--border);
 }
 
 @media (min-width: 768px) {
@@ -56,7 +56,7 @@
   font-size: 1.5rem;
   font-weight: 700;
   letter-spacing: 0.05em;
-  color: #fff;
+  color: var(--text-primary);
 }
 
 .footer-logo-title span {
@@ -66,7 +66,7 @@
 .footer-brand-desc {
   font-size: 0.95rem;
   line-height: 1.6;
-  color: #8fa0ac;
+  color: var(--text-muted);
   max-width: 320px;
 }
 
@@ -84,7 +84,7 @@
   font-weight: 500;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #8fa0ac;
+  color: var(--text-muted);
 }
 
 .footer-newsletter-form {
@@ -95,14 +95,14 @@
 
 .footer-newsletter-input {
   flex-grow: 1;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid var(--border);
   border-radius: 4px;
   padding: 0.75rem 1rem;
   font-size: 0.85rem;
-  color: #fff;
+  color: var(--text-primary);
   outline: none;
-  transition: all 0.3s ease;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
 }
 
 .footer-newsletter-input:focus {
@@ -113,14 +113,14 @@
 
 .footer-subscribe-btn {
   background: var(--accent-gradient);
-  color: #050508;
+  color: var(--background);
   border: none;
   border-radius: 4px;
   padding: 0 1.25rem;
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   box-shadow: 0 4px 15px rgba(255, 85, 0, 0.2);
 }
 
@@ -142,7 +142,7 @@
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #fff;
+  color: var(--text-primary);
 }
 
 .footer-links-list {
@@ -153,8 +153,8 @@
 
 .footer-link-item a {
   font-size: 0.9rem;
-  color: #8fa0ac;
-  transition: all 0.25s ease;
+  color: var(--text-muted);
+  transition: color 0.25s ease;
   display: inline-block;
   position: relative;
 }
@@ -173,7 +173,7 @@
 }
 
 .footer-link-item a:hover {
-  color: #fff;
+  color: var(--text-primary);
 }
 
 .footer-link-item a:hover::after {
@@ -187,7 +187,7 @@
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid var(--border);
   padding-top: 2rem;
 }
 
@@ -201,7 +201,7 @@
 
 .footer-copyright {
   font-size: 0.8rem;
-  color: #5c6c77;
+  color: var(--text-muted);
 }
 
 .footer-socials {
@@ -214,17 +214,17 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.02);
-  color: #8fa0ac;
-  transition: all 0.3s ease;
+  background: transparent;
+  color: var(--text-muted);
+  transition: color 0.3s ease, border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
 }
 
 .footer-social-btn:hover {
-  color: #fff;
+  color: var(--text-primary);
   border-color: var(--accent-primary);
   background: rgba(255, 85, 0, 0.08);
   box-shadow: 0 0 10px rgba(255, 85, 0, 0.15);
@@ -239,7 +239,7 @@
   font-size: 0.7rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #8fa0ac;
+  color: var(--text-muted);
   background: none;
   border: none;
   cursor: pointer;
@@ -256,4 +256,32 @@
 
 .footer-back-to-top:hover .footer-back-to-top-arrow {
   transform: translateY(-4px);
+}
+
+/* ==========================================================
+   LIGHT MODE OVERRIDES
+   ========================================================== */
+
+/* Newsletter input — subtle on cream */
+:root:not(.dark) .footer-newsletter-input {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+:root:not(.dark) .footer-newsletter-input:focus {
+  background: rgba(0, 0, 0, 0.02);
+  box-shadow: 0 0 12px rgba(255, 85, 0, 0.06);
+}
+
+/* Subscribe button glow — softer on light */
+:root:not(.dark) .footer-subscribe-btn {
+  box-shadow: 0 4px 12px rgba(255, 85, 0, 0.12);
+}
+
+:root:not(.dark) .footer-subscribe-btn:hover {
+  box-shadow: 0 6px 16px rgba(255, 85, 0, 0.18);
+}
+
+/* Social hover glow — tone down */
+:root:not(.dark) .footer-social-btn:hover {
+  box-shadow: 0 0 8px rgba(255, 85, 0, 0.1);
 }

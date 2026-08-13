@@ -5,14 +5,17 @@
   position: relative;
   overflow: hidden;
   border-radius: 1.7rem;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background-color: rgba(255, 255, 255, 0.02);
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border);
+  background-color: rgba(0, 0, 0, 0.02);
+  /* Only border-color transitions — no transform (GSAP handles parent row),
+     no box-shadow (CPU-painted, kills fps with 10 cards during scroll) */
+  transition: border-color 0.3s ease;
   cursor: pointer;
   /* Isolate each card's paint/layout — changes inside one card
      cannot invalidate siblings or parent, preventing cascade repaints */
   contain: layout style paint;
+  /* Pre-promote to GPU layer — avoids first-scroll composite spike */
+  will-change: transform;
 }
 
 .project-marquee-card::before {
@@ -65,7 +68,7 @@
   font-family: var(--font-heading);
   font-size: 1.25rem;
   font-weight: 700;
-  color: #fff;
+  color: #fff; /* overlay always on dark photo */
   letter-spacing: -0.01em;
   margin-bottom: 0.5rem;
   transform: translateY(12px);
@@ -113,7 +116,7 @@
 .project-marquee-year {
   font-family: var(--font-mono);
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-muted);
 }
 
 /* Shimmer Loader for Project Marquee Cards */
@@ -183,4 +186,41 @@
   50% {
     opacity: 0.8;
   }
+}
+
+/* Card gradient overlay — theme-aware */
+.project-marquee-gradient {
+  background: linear-gradient(to top, rgba(7, 9, 15, 0.5) 0%, transparent 50%, rgba(255, 255, 255, 0.04) 100%);
+}
+
+/* ==========================================================
+   LIGHT MODE OVERRIDES
+   ========================================================== */
+
+:root:not(.dark) .project-marquee-gradient {
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.15) 0%, transparent 50%, rgba(255, 255, 255, 0.08) 100%);
+}
+
+/* Hover overlay — lighter gradient */
+:root:not(.dark) .project-marquee-overlay {
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.3) 60%, transparent 100%);
+}
+
+/* Hover glow — toned down */
+:root:not(.dark) .project-marquee-card:hover {
+  border-color: rgba(34, 211, 238, 0.3);
+}
+
+/* Shimmer bg */
+:root:not(.dark) .project-marquee-shimmer {
+  background: var(--background);
+}
+
+:root:not(.dark) .project-marquee-shimmer::after {
+  background: linear-gradient(90deg, transparent 25%, rgba(0, 0, 0, 0.04) 50%, transparent 75%);
+}
+
+/* Badge glow — softer */
+:root:not(.dark) .project-marquee-badge {
+  box-shadow: none;
 }
