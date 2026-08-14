@@ -44,3 +44,4 @@ next-env.d.ts
 ffmpeg-bin/
 *.zip
 *.mp4
+!public/videos/*.mp4
