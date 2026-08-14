@@ -2,7 +2,7 @@
 
 import "@/styles/work.css";
 
-import { useRef, useLayoutEffect, useState, useEffect } from "react";
+import { useRef, useLayoutEffect, useState, useEffect, memo } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -379,7 +379,7 @@ export function Work() {
   const sectionRef = useRef<HTMLElement>(null);
   const progressFillRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(0);
+  const activeIndexRef = useRef(0);
   const prevActiveRef = useRef(-1);
 
   useLayoutEffect(() => {
@@ -439,8 +439,22 @@ export function Work() {
 
           if (prevActiveRef.current !== panelIndex) {
             const prevIdx = prevActiveRef.current;
-            setActiveIndex(panelIndex);
             prevActiveRef.current = panelIndex;
+            activeIndexRef.current = panelIndex;
+
+            // Toggle .is-active via direct DOM — avoids React re-render
+            allPanels.forEach((p, i) => {
+              p.classList.toggle("is-active", i === panelIndex);
+            });
+
+            // Update dot rail + counter via DOM
+            section.querySelectorAll(".work-dot-btn").forEach((btn, i) => {
+              btn.classList.toggle("active", i === panelIndex);
+              btn.setAttribute("aria-current", i === panelIndex ? "true" : "false");
+            });
+            const counterEl = section.querySelector(".work-chapter-current");
+            if (counterEl) counterEl.textContent = String(panelIndex + 1).padStart(2, "0");
+
             if (panelIndex < projectPanels.length && !noMotion) {
               activateProjectPanel(projectPanels, panelIndex, prevIdx);
             }
@@ -461,16 +475,18 @@ export function Work() {
         const bgGlow     = panel.querySelector<HTMLElement>(".work-panel-glow");
 
         let rafId: number | null = null;
+        let cachedRect: DOMRect | null = null;
+        const onEnter = () => { cachedRect = panel.getBoundingClientRect(); };
         const onMove = (e: MouseEvent) => {
           if (rafId) return;
           rafId = requestAnimationFrame(() => {
-            const rect = panel.getBoundingClientRect();
+            const rect = cachedRect || panel.getBoundingClientRect();
             const x = (e.clientX - rect.left) / rect.width - 0.5;  // -0.5 … +0.5
             const y = (e.clientY - rect.top)  / rect.height - 0.5;
 
             if (img)     gsap.to(img,     { x: x * -24, y: y * -14, duration: 1.1, ease: "power2.out", overwrite: true });
             if (content) gsap.to(content, { rotateY: x * 5, rotateX: y * -3, duration: 1.1, ease: "power2.out", overwrite: true });
-            if (mesh)    gsap.to(mesh,    { rotateX: y * -12, rotateY: x * 14, "--mouse-x": `${e.clientX - rect.left}px`, "--mouse-y": `${e.clientY - rect.top}px`, duration: 1.4, ease: "power2.out", overwrite: true });
+            if (mesh)    gsap.to(mesh,    { rotateX: y * -12, rotateY: x * 14, duration: 1.4, ease: "power2.out", overwrite: true });
             if (bgGlow)  gsap.to(bgGlow,  { x: x * 400, y: y * 400, duration: 2, ease: "power2.out", overwrite: true });
 
             floatIcons.forEach((icon, i) => {
@@ -484,18 +500,20 @@ export function Work() {
         const onLeave = () => {
           if (img)     gsap.to(img,     { x: 0, y: 0, duration: 1.2, ease: "power3.out", overwrite: "auto" });
           if (content) gsap.to(content, { rotateY: 0, rotateX: 0, duration: 1.2, ease: "power3.out", overwrite: "auto" });
-          if (mesh)    gsap.to(mesh,    { rotateX: 0, rotateY: 0, "--mouse-x": `50%`, "--mouse-y": `50%`, duration: 1.4, ease: "power3.out", overwrite: "auto" });
+          if (mesh)    gsap.to(mesh,    { rotateX: 0, rotateY: 0, duration: 1.4, ease: "power3.out", overwrite: "auto" });
           if (bgGlow)  gsap.to(bgGlow,  { x: 0, y: 0, duration: 1.8, ease: "power3.out", overwrite: "auto" });
           floatIcons.forEach(icon => gsap.to(icon, { x: 0, y: 0, duration: 1.2, ease: "power3.out", overwrite: "auto" }));
         };
 
         panel.addEventListener("mousemove", onMove);
         panel.addEventListener("mouseleave", onLeave);
+        panel.addEventListener("mouseenter", onEnter);
 
         // Store cleanup so listeners are removed on re-run / unmount
         cleanupFns.push(() => {
           panel.removeEventListener("mousemove", onMove);
           panel.removeEventListener("mouseleave", onLeave);
+          panel.removeEventListener("mouseenter", onEnter);
         });
       });
     }
@@ -511,7 +529,7 @@ export function Work() {
         const meta = panel.querySelector<HTMLElement>(".work-panel-meta");
 
         if (i === 0) {
-          if (img) gsap.set(img, { scale: 1, filter: "saturate(1) brightness(1)" });
+          if (img) gsap.set(img, { scale: 1, opacity: 1 });
           if (tags.length) gsap.set(tags, { color: "#FF5500", borderColor: "rgba(255,85,0,0.55)", background: "rgba(255,85,0,0.08)", opacity: 1, y: 0 });
           if (rule) gsap.set(rule, { scaleX: 1, opacity: 1 });
           if (meta) gsap.set(meta, { opacity: 1, y: 0 });
@@ -521,7 +539,7 @@ export function Work() {
             gsap.set(name, { opacity: 1 });
           }
         } else {
-          if (img) gsap.set(img, { scale: 0.92, filter: "saturate(0.15) brightness(0.45)" });
+          if (img) gsap.set(img, { scale: 0.92, opacity: 0.45 });
           if (tags.length) gsap.set(tags, { color: "rgba(255,255,255,0.2)", borderColor: "rgba(255,255,255,0.07)", background: "transparent", opacity: 1, y: 0 });
           if (name) gsap.set(name, { opacity: 0.3 });
           if (desc) gsap.set(desc, { opacity: 0.2, y: 0 });
@@ -554,9 +572,9 @@ export function Work() {
           <div className="work-track-overflow">
             <div className="work-track">
               {PROJECTS.map((project, idx) => (
-                <DesktopPanel key={project.id} project={project} isActive={activeIndex === idx} />
+                <MemoDesktopPanel key={project.id} project={project} isActive={idx === 0} />
               ))}
-              <ClosingPanel isActive={activeIndex === PROJECTS.length} />
+              <MemoClosingPanel isActive={false} />
             </div>
           </div>
 
@@ -566,7 +584,7 @@ export function Work() {
             role="progressbar"
             aria-label="Gallery progress"
             aria-valuemin={0} aria-valuemax={100}
-            aria-valuenow={Math.round((activeIndex / (TOTAL_PANELS - 1)) * 100)}
+            aria-valuenow={0}
           >
             <div ref={progressFillRef} className="work-progress-fill"
               style={{ transformOrigin: "left center", transform: "scaleX(0)" }} />
@@ -578,9 +596,9 @@ export function Work() {
             {Array.from({ length: TOTAL_PANELS }).map((_, i) => (
               <button
                 key={i}
-                className={`work-dot-btn${activeIndex === i ? " active" : ""}`}
+                className={`work-dot-btn${i === 0 ? " active" : ""}`}
                 aria-label={i < PROJECTS.length ? `Project ${PROJECTS[i].name}` : "More work"}
-                aria-current={activeIndex === i ? "true" : undefined}
+                aria-current={i === 0 ? "true" : undefined}
                 tabIndex={0}
               >
                 <span className="work-dot-inner" />
@@ -590,7 +608,7 @@ export function Work() {
 
           {/* Chapter counter (bottom-right) */}
           <div className="work-chapter-counter" aria-hidden="true">
-            <span className="work-chapter-current">{String(activeIndex + 1).padStart(2, "0")}</span>
+            <span className="work-chapter-current">01</span>
             <span className="work-chapter-sep" />
             <span className="work-chapter-total">{String(TOTAL_PANELS).padStart(2, "0")}</span>
           </div>
@@ -633,7 +651,7 @@ function activateProjectPanel(panels: HTMLElement[], activeIdx: number, prevIdx:
     const metaEl = panel.querySelector<HTMLElement>(".work-panel-meta");
 
     if (i === activeIdx) {
-      if (img) gsap.to(img, { scale: 1, filter: "saturate(1) brightness(1)", duration: 0.8, ease: "power2.out", overwrite: "auto" });
+      if (img) gsap.to(img, { scale: 1, opacity: 1, duration: 0.8, ease: "power2.out", overwrite: "auto" });
       if (ruleEl) gsap.fromTo(ruleEl, { scaleX: 0, opacity: 1 }, { scaleX: 1, opacity: 1, duration: 0.6, ease: "power3.out", overwrite: "auto" });
       if (metaEl) gsap.fromTo(metaEl, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out", overwrite: "auto" });
       if (nameEl) {
@@ -645,7 +663,7 @@ function activateProjectPanel(panels: HTMLElement[], activeIdx: number, prevIdx:
         { opacity: 1, y: 0, color: "#FF5500", borderColor: "rgba(255,85,0,0.55)", background: "rgba(255,85,0,0.08)", stagger: 0.07, duration: 0.45, ease: "power2.out", delay: 0.2, overwrite: "auto", clearProps: "transform" }
       );
     } else {
-      if (img) gsap.to(img, { scale: 0.92, filter: "saturate(0.15) brightness(0.45)", duration: 0.65, ease: "power2.inOut", overwrite: "auto" });
+      if (img) gsap.to(img, { scale: 0.92, opacity: 0.45, duration: 0.65, ease: "power2.inOut", overwrite: "auto" });
       if (tags.length) gsap.to(tags, { color: "rgba(255,255,255,0.2)", borderColor: "rgba(255,255,255,0.07)", background: "transparent", duration: 0.35, overwrite: "auto", clearProps: "transform" });
       if (nameEl) gsap.to(nameEl, { opacity: 0.3, duration: 0.4, overwrite: "auto" });
       if (descEl) gsap.to(descEl, { opacity: 0.2, duration: 0.35, overwrite: "auto" });
@@ -792,6 +810,7 @@ function DesktopPanel({ project, isActive }: { project: Project; isActive: boole
     </article>
   );
 }
+const MemoDesktopPanel = memo(DesktopPanel);
 
 /* ════════════════════════════════════════════════════════════
    CLOSING PANEL
@@ -820,6 +839,7 @@ function ClosingPanel({ isActive }: { isActive: boolean }) {
     </article>
   );
 }
+const MemoClosingPanel = memo(ClosingPanel);
 
 /* ════════════════════════════════════════════════════════════
    MOBILE CLOSING CARD

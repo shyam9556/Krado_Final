@@ -129,10 +129,18 @@
 .work-panel-image {
   object-fit: cover;
   object-position: center;
-  /* default state Ã¢â‚¬â€ GSAP overrides per-panel */
+  /* Static desaturation — never animated (GPU-expensive).
+     GSAP animates only opacity + scale for panel transitions. */
   transform: scale(0.9);
-  filter: saturate(0.2) brightness(0.5);
+  filter: saturate(0.25) brightness(0.55);
+  opacity: 0.45;
   transition: none;
+}
+
+/* Active panel: reveal full-color image via opacity */
+.is-active .work-panel-image {
+  filter: saturate(1) brightness(1);
+  opacity: 1;
 }
 
 /* Gradient blend from image into dark background */
