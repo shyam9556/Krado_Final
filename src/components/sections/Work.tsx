@@ -290,30 +290,31 @@ function MobileProjectCard({ project, idx }: { project: Project; idx: number }) 
       <span className="work-mobile-ghost-index" aria-hidden="true">{project.index}</span>
       
       {project.url ? (
-        <a href={project.url} target="_blank" rel="noopener noreferrer" className="work-mobile-image-wrap block group relative overflow-visible">
+        <a href={project.url} target="_blank" rel="noopener noreferrer" className="work-mobile-image-wrap block group relative overflow-hidden">
           
-          {/* Simulated Video Tour Indicator */}
+          {/* Live Tour badge — simplified: no pulsing glow (GPU expensive on mobile) */}
           {project.videoTour && (
-            <div className="absolute -top-3 -left-2 z-20 flex items-center gap-2 px-2.5 py-1 bg-black/80 rounded-full border border-white/10 pointer-events-none">
-              <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
-              <span className="text-white/90 text-[9px] font-mono uppercase tracking-widest font-semibold mt-[1px]">Live</span>
+            <div className="absolute top-2 left-2 z-20 flex items-center gap-1.5 px-2 py-1 bg-black/80 rounded-full border border-white/10 pointer-events-none">
+              <div className="w-1.5 h-1.5 bg-red-500 rounded-full" />
+              <span className="text-white/90 text-[9px] font-mono uppercase tracking-widest font-semibold">Live</span>
             </div>
           )}
 
-          {project.videoTour ? (
-            project.mockupType === "desktop" ? (
-               <DesktopMonitorMockup videoUrl={project.videoUrl} shortImage={project.image} tallImage={project.imageTall} isVideo={project.videoTour} />
-            ) : (
-               <LaptopMockup isVideo={project.videoTour} tallImage={project.imageTall} shortImage={project.image} videoUrl={project.videoUrl} />
-            )
-          ) : (
-            <>
-              <Image src={project.image} alt={project.imageAlt} fill sizes="(max-width: 768px) 100vw, 50vw" quality={75} className="work-mobile-image group-hover:scale-105 group-hover:brightness-75 transition-[transform,filter] duration-700" priority={idx <= 1} />
-              <div className="work-mobile-image-overlay pointer-events-none" />
-            </>
-          )}
+          {/* M9 Fix: Always use plain image on mobile — no LaptopMockup/DesktopMonitorMockup.
+              Heavy mockups (shadow-2xl, nested gradients, 24s CSS animations) cause
+              compositor layer explosions and frame drops on mobile devices. */}
+          <Image
+            src={project.image}
+            alt={project.imageAlt}
+            fill
+            sizes="(max-width: 768px) 100vw, 50vw"
+            quality={75}
+            className="work-mobile-image"
+            priority={idx <= 1}
+          />
+          <div className="work-mobile-image-overlay pointer-events-none" />
 
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-30">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-500 z-30">
             <span className="px-4 py-2 bg-black/80 border border-white/20 text-white text-xs uppercase tracking-wider rounded-full flex items-center gap-2">
               Visit Site
               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
@@ -321,25 +322,24 @@ function MobileProjectCard({ project, idx }: { project: Project; idx: number }) 
           </div>
         </a>
       ) : (
-        <div className="work-mobile-image-wrap overflow-visible">
+        <div className="work-mobile-image-wrap overflow-hidden">
           {project.videoTour && (
-            <div className="absolute -top-3 -left-2 z-20 flex items-center gap-2 px-2.5 py-1 bg-black/80 rounded-full border border-white/10 pointer-events-none">
-              <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
-              <span className="text-white/90 text-[9px] font-mono uppercase tracking-widest font-semibold mt-[1px]">Live Tour</span>
+            <div className="absolute top-2 left-2 z-20 flex items-center gap-1.5 px-2 py-1 bg-black/80 rounded-full border border-white/10 pointer-events-none">
+              <div className="w-1.5 h-1.5 bg-red-500 rounded-full" />
+              <span className="text-white/90 text-[9px] font-mono uppercase tracking-widest font-semibold">Live Tour</span>
             </div>
           )}
-          {project.videoTour ? (
-            project.mockupType === "desktop" ? (
-               <DesktopMonitorMockup videoUrl={project.videoUrl} shortImage={project.image} tallImage={project.imageTall} isVideo={project.videoTour} />
-            ) : (
-               <LaptopMockup isVideo={project.videoTour} tallImage={project.imageTall} shortImage={project.image} videoUrl={project.videoUrl} />
-            )
-          ) : (
-            <>
-              <Image src={project.image} alt={project.imageAlt} fill sizes="(max-width: 768px) 100vw, 50vw" quality={75} className="work-mobile-image" priority={idx <= 1} />
-              <div className="work-mobile-image-overlay pointer-events-none" />
-            </>
-          )}
+          {/* Plain image always — same rationale as above */}
+          <Image
+            src={project.image}
+            alt={project.imageAlt}
+            fill
+            sizes="(max-width: 768px) 100vw, 50vw"
+            quality={75}
+            className="work-mobile-image"
+            priority={idx <= 1}
+          />
+          <div className="work-mobile-image-overlay pointer-events-none" />
         </div>
       )}
 
@@ -565,71 +565,68 @@ export function Work() {
         <span className="work-section-tag">04 — SELECTED WORK</span>
       </div>
 
-      {/* ══════════════ DESKTOP ══════════════ */}
-      {!isMobile && (
-        <>
-          {/* Clipping overflow wrapper */}
-          <div className="work-track-overflow">
-            <div className="work-track">
-              {PROJECTS.map((project, idx) => (
-                <MemoDesktopPanel key={project.id} project={project} isActive={idx === 0} />
-              ))}
-              <MemoClosingPanel isActive={false} />
-            </div>
-          </div>
-
-          {/* Progress line (bottom edge) */}
-          <div
-            className="work-progress-track"
-            role="progressbar"
-            aria-label="Gallery progress"
-            aria-valuemin={0} aria-valuemax={100}
-            aria-valuenow={0}
-          >
-            <div ref={progressFillRef} className="work-progress-fill"
-              style={{ transformOrigin: "left center", transform: "scaleX(0)" }} />
-          </div>
-
-          {/* Vertical dot-rail (left side) — FIX: moved away from bottom-centre
-              to avoid conflict with cursor and progress bar */}
-          <nav className="work-dot-rail" aria-label="Panel navigation">
-            {Array.from({ length: TOTAL_PANELS }).map((_, i) => (
-              <button
-                key={i}
-                className={`work-dot-btn${i === 0 ? " active" : ""}`}
-                aria-label={i < PROJECTS.length ? `Project ${PROJECTS[i].name}` : "More work"}
-                aria-current={i === 0 ? "true" : undefined}
-                tabIndex={0}
-              >
-                <span className="work-dot-inner" />
-              </button>
+      {/* ══════════════ DESKTOP ══════════════
+          Always rendered; CSS hides on ≤767px (M15: prevents SSR→hydrate layout shift) */}
+      <>
+        {/* Clipping overflow wrapper */}
+        <div className="work-track-overflow">
+          <div className="work-track">
+            {PROJECTS.map((project, idx) => (
+              <MemoDesktopPanel key={project.id} project={project} isActive={idx === 0} />
             ))}
-          </nav>
-
-          {/* Chapter counter (bottom-right) */}
-          <div className="work-chapter-counter" aria-hidden="true">
-            <span className="work-chapter-current">01</span>
-            <span className="work-chapter-sep" />
-            <span className="work-chapter-total">{String(TOTAL_PANELS).padStart(2, "0")}</span>
+            <MemoClosingPanel isActive={false} />
           </div>
-        </>
-      )}
-
-      {/* ══════════════ MOBILE ══════════════ */}
-      {isMobile && (
-        <div className="work-mobile-stack">
-          <div className="work-mobile-header">
-            <span className="work-section-tag" style={{ display: "block", marginBottom: "0.75rem" }}>
-              04 — SELECTED WORK
-            </span>
-            <h2 className="work-mobile-section-title">SELECTED WORK</h2>
-          </div>
-          {PROJECTS.map((project, idx) => (
-            <MobileProjectCard key={project.id} project={project} idx={idx} />
-          ))}
-          <MobileClosingCard />
         </div>
-      )}
+
+        {/* Progress line (bottom edge) */}
+        <div
+          className="work-progress-track"
+          role="progressbar"
+          aria-label="Gallery progress"
+          aria-valuemin={0} aria-valuemax={100}
+          aria-valuenow={0}
+        >
+          <div ref={progressFillRef} className="work-progress-fill"
+            style={{ transformOrigin: "left center", transform: "scaleX(0)" }} />
+        </div>
+
+        {/* Vertical dot-rail (left side) */}
+        <nav className="work-dot-rail" aria-label="Panel navigation">
+          {Array.from({ length: TOTAL_PANELS }).map((_, i) => (
+            <button
+              key={i}
+              className={`work-dot-btn${i === 0 ? " active" : ""}`}
+              aria-label={i < PROJECTS.length ? `Project ${PROJECTS[i].name}` : "More work"}
+              aria-current={i === 0 ? "true" : undefined}
+              tabIndex={0}
+            >
+              <span className="work-dot-inner" />
+            </button>
+          ))}
+        </nav>
+
+        {/* Chapter counter (bottom-right) */}
+        <div className="work-chapter-counter" aria-hidden="true">
+          <span className="work-chapter-current">01</span>
+          <span className="work-chapter-sep" />
+          <span className="work-chapter-total">{String(TOTAL_PANELS).padStart(2, "0")}</span>
+        </div>
+      </>
+
+      {/* ══════════════ MOBILE ══════════════
+          Always rendered; CSS hides on ≥768px (M15: prevents SSR→hydrate layout shift) */}
+      <div className="work-mobile-stack">
+        <div className="work-mobile-header">
+          <span className="work-section-tag" style={{ display: "block", marginBottom: "0.75rem" }}>
+            04 — SELECTED WORK
+          </span>
+          <h2 className="work-mobile-section-title">SELECTED WORK</h2>
+        </div>
+        {PROJECTS.map((project, idx) => (
+          <MobileProjectCard key={project.id} project={project} idx={idx} />
+        ))}
+        <MobileClosingCard />
+      </div>
     </section>
   );
 }

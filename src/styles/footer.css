@@ -6,9 +6,17 @@
   width: 100%;
   background-color: var(--background);
   color: var(--text-secondary);
-  padding: 8rem 1.5rem 4rem;
+  /* L8/#53: 8rem (128px) top on mobile = 22.5% of 568px viewport wasted.
+     Mobile-first: 4rem base → 8rem at 480px → 10rem at 768px. */
+  padding: 4rem 1.5rem 4rem;
   overflow: hidden;
   border-top: 1px solid var(--border);
+}
+
+@media (min-width: 480px) {
+  .footer-section {
+    padding-top: 8rem;
+  }
 }
 
 @media (min-width: 768px) {
@@ -95,6 +103,11 @@
 
 .footer-newsletter-input {
   flex-grow: 1;
+  /* M21: min-height ensures 44px WCAG touch target regardless of font size.
+     box-sizing:border-box includes padding in the height so the 44px
+     minimum is respected even when the browser default is content-box. */
+  min-height: 44px;
+  box-sizing: border-box;
   background: rgba(0, 0, 0, 0.02);
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -111,7 +124,19 @@
   background: rgba(255, 255, 255, 0.05);
 }
 
+.footer-newsletter-input:active {
+  box-shadow: 0 0 8px rgba(255, 85, 0, 0.2);
+}
+
 .footer-subscribe-btn {
+  /* M22: explicit min-height + flex layout so the button always meets
+     the 44px touch target. Previous: padding:0 with only horizontal
+     spacing — height was inherited from flex-stretch of the input,
+     which itself could be below 44px. */
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: var(--accent-gradient);
   color: var(--background);
   border: none;
@@ -124,9 +149,18 @@
   box-shadow: 0 4px 15px rgba(255, 85, 0, 0.2);
 }
 
-.footer-subscribe-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 85, 0, 0.35);
+/* M22 / Issue #51: :active tap feedback for touch.
+   Hover-only lift animation is invisible on touch devices. */
+.footer-subscribe-btn:active:not(:disabled) {
+  transform: scale(0.96);
+  box-shadow: 0 2px 8px rgba(255, 85, 0, 0.2);
+}
+
+@media (hover: hover) {
+  .footer-subscribe-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 85, 0, 0.35);
+  }
 }
 
 /* Links Columns */
@@ -156,6 +190,7 @@
   color: var(--text-muted);
   transition: color 0.25s ease;
   display: inline-block;
+  padding: 0.625rem 0;
   position: relative;
 }
 
@@ -172,13 +207,15 @@
   transition: transform 0.3s ease;
 }
 
-.footer-link-item a:hover {
-  color: var(--text-primary);
-}
+@media (hover: hover) {
+  .footer-link-item a:hover {
+    color: var(--text-primary);
+  }
 
-.footer-link-item a:hover::after {
-  transform: scaleX(1);
-  transform-origin: left;
+  .footer-link-item a:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
 }
 
 
@@ -211,8 +248,8 @@
 }
 
 .footer-social-btn {
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   border: 1px solid var(--border);
   display: flex;
@@ -223,11 +260,13 @@
   transition: color 0.3s ease, border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
 }
 
-.footer-social-btn:hover {
-  color: var(--text-primary);
-  border-color: var(--accent-primary);
-  background: rgba(255, 85, 0, 0.08);
-  box-shadow: 0 0 10px rgba(255, 85, 0, 0.15);
+@media (hover: hover) {
+  .footer-social-btn:hover {
+    color: var(--text-primary);
+    border-color: var(--accent-primary);
+    background: rgba(255, 85, 0, 0.08);
+    box-shadow: 0 0 10px rgba(255, 85, 0, 0.15);
+  }
 }
 
 /* Back to Top */
@@ -243,19 +282,25 @@
   background: none;
   border: none;
   cursor: pointer;
+  min-height: 44px;
+  padding: 0.5rem 0;
   transition: color 0.25s ease;
 }
 
-.footer-back-to-top:hover {
-  color: var(--accent-primary);
+@media (hover: hover) {
+  .footer-back-to-top:hover {
+    color: var(--accent-primary);
+  }
 }
 
 .footer-back-to-top-arrow {
   transition: transform 0.3s ease;
 }
 
-.footer-back-to-top:hover .footer-back-to-top-arrow {
-  transform: translateY(-4px);
+@media (hover: hover) {
+  .footer-back-to-top:hover .footer-back-to-top-arrow {
+    transform: translateY(-4px);
+  }
 }
 
 /* ==========================================================
@@ -277,11 +322,12 @@
   box-shadow: 0 4px 12px rgba(255, 85, 0, 0.12);
 }
 
-:root:not(.dark) .footer-subscribe-btn:hover {
-  box-shadow: 0 6px 16px rgba(255, 85, 0, 0.18);
-}
+@media (hover: hover) {
+  :root:not(.dark) .footer-subscribe-btn:hover {
+    box-shadow: 0 6px 16px rgba(255, 85, 0, 0.18);
+  }
 
-/* Social hover glow — tone down */
-:root:not(.dark) .footer-social-btn:hover {
-  box-shadow: 0 0 8px rgba(255, 85, 0, 0.1);
+  :root:not(.dark) .footer-social-btn:hover {
+    box-shadow: 0 0 8px rgba(255, 85, 0, 0.1);
+  }
 }

@@ -311,9 +311,19 @@
 
   /* ----- Section rhythm ----- */
 
+  /* L1: Mobile-first section padding.
+     Base = 4rem (small phones). Scales up as viewport grows:
+     ≤479px = 4rem | 480–767px = 6rem | ≥768px = 8rem */
   .section-padding {
-    padding-top: 6rem;    /* py-24 */
-    padding-bottom: 6rem;
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+
+  @media (min-width: 480px) {
+    .section-padding {
+      padding-top: 6rem;    /* py-24 */
+      padding-bottom: 6rem;
+    }
   }
 
   @media (min-width: 768px) {

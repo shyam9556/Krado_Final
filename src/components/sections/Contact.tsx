@@ -72,14 +72,16 @@ export function Contact() {
       {/* Background radial overlays */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         <div className="scanline-grid opacity-[0.02] absolute inset-0" />
+        {/* L9/#50: Hardcoded 600x600 orb overflowed 320px viewport (extends to 360px).
+            Hidden on xs, visible sm+ with viewport-proportional sizing. */}
         <div
-          className="absolute left-[-15rem] top-[-10rem] h-[600px] w-[600px] rounded-full"
+          className="absolute left-[-8rem] sm:left-[-15rem] top-[-6rem] sm:top-[-10rem] h-[min(60vw,600px)] w-[min(60vw,600px)] rounded-full"
           style={{
             background: "radial-gradient(circle, rgba(255,85,0,0.04) 0%, transparent 90%)",
           }}
         />
         <div
-          className="absolute right-[-10rem] top-1/2 h-[500px] w-[500px] rounded-full"
+          className="absolute right-[-6rem] sm:right-[-10rem] top-1/2 h-[min(50vw,500px)] w-[min(50vw,500px)] rounded-full"
           style={{
             background: "radial-gradient(circle, rgba(34,211,238,0.015) 0%, transparent 88%)",
           }}

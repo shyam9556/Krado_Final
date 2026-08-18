@@ -25,6 +25,10 @@ export function Hero() {
   const tiltRef = useRef<HTMLDivElement>(null);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    // L2: Guard against synthesized mousemove events on touch devices.
+    // Chrome on Android and some WebViews polyfill mousemove from touch —
+    // causes hero to tilt while scrolling. pointer:coarse = touch-first hardware.
+    if (window.matchMedia("(pointer: coarse)").matches) return;
     if (prefersReducedMotion || !tiltRef.current) return;
     const { clientX, clientY } = e;
     const { innerWidth, innerHeight } = window;
@@ -46,8 +50,13 @@ export function Hero() {
       // Once fully faded, unregister — no more scroll work needed
       if (progress >= 1 && scrollOpacityRef.current === 0) return;
       const newOpacity = 1 - progress;
-      // Only trigger React re-render when opacity changes by > 0.05
-      if (Math.abs(newOpacity - scrollOpacityRef.current) > 0.05) {
+      // Force update at exact boundaries (0 or 1) to guarantee clean fade-out/in.
+      // Otherwise, a final delta < 0.05 leaves a faint ghost at ~4% opacity.
+      const isBoundary =
+        (newOpacity === 0 && scrollOpacityRef.current !== 0) ||
+        (newOpacity === 1 && scrollOpacityRef.current !== 1);
+      // Only trigger React re-render when opacity changes by > 0.05 or hits boundary
+      if (isBoundary || Math.abs(newOpacity - scrollOpacityRef.current) > 0.05) {
         scrollOpacityRef.current = newOpacity;
         setScrollIndicatorOpacity(newOpacity);
       }
@@ -179,27 +188,28 @@ export function Hero() {
             <Magnetic strength={0.25}>
               <a 
                 href="#contact" 
-                className="group relative overflow-hidden bg-foreground px-8 py-4 text-sm font-bold text-background transition-[border-color] duration-300 inline-flex items-center gap-3 border border-transparent hover:border-accent-primary"
+                className="hero-cta-primary relative overflow-hidden bg-foreground px-8 py-4 text-sm font-bold text-background inline-flex items-center gap-3 border"
                 style={{ borderRadius: "2px" }}
               >
-                <div className="absolute inset-0 bg-accent-primary transform scale-y-0 group-hover:scale-y-100 origin-bottom transition-transform duration-500 ease-[0.76,0,0.24,1]" />
-                <span className="relative z-10 group-hover:text-background transition-colors duration-300">Start a Project</span>
-                <span className="relative z-10 transform translate-x-0 group-hover:translate-x-1 group-hover:text-background transition-[transform,color] duration-300">→</span>
+                <div className="hero-cta-primary__sweep absolute inset-0 bg-accent-primary" />
+                <span className="hero-cta-primary__text relative z-10">Start a Project</span>
+                <span className="hero-cta-primary__arrow relative z-10">→</span>
               </a>
             </Magnetic>
             
             <Magnetic strength={0.15}>
               <a 
                 href="#work" 
-                className="group relative text-sm font-bold tracking-widest uppercase text-foreground inline-flex items-center gap-2 overflow-hidden py-2"
+                className="hero-cta-secondary relative text-sm font-bold tracking-widest uppercase text-foreground inline-flex items-center gap-2 overflow-hidden py-2"
               >
                 <span className="relative flex flex-col items-center">
-                  <span className="transition-transform duration-300 ease-[0.76,0,0.24,1] group-hover:-translate-y-[120%]">View Our Work</span>
-                  <span className="absolute top-0 left-0 transition-transform duration-300 ease-[0.76,0,0.24,1] translate-y-[120%] group-hover:translate-y-0 text-accent-primary">View Our Work</span>
+                  <span className="hero-cta-secondary__slide-top">View Our Work</span>
+                  <span className="hero-cta-secondary__slide-bottom">View Our Work</span>
                 </span>
-                <span className="text-accent-primary transform translate-x-0 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform">↗</span>
+                <span className="hero-cta-secondary__arrow text-accent-primary">↗</span>
               </a>
             </Magnetic>
+
           </motion.div>
 
         </div>

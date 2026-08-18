@@ -19,14 +19,21 @@ export function WireframeCanvas() {
   const lastTimeRef = useRef<number>(0);
   const timeRef = useRef<number>(0);
   const [isMounted, setIsMounted] = useState(false);
+  const [isTouchDevice, setIsTouchDevice] = useState(true);
+
+  // Detect touch device — skip canvas entirely on mobile
+  useEffect(() => {
+    setIsTouchDevice(window.matchMedia("(pointer: coarse)").matches);
+  }, []);
 
   useEffect(() => {
+    if (isTouchDevice) return;
     const el = containerRef.current;
     if (!el) return;
     const obs = new IntersectionObserver(([e]) => setIsMounted(e.isIntersecting), { rootMargin: "100px 0px" });
     obs.observe(el);
     return () => obs.disconnect();
-  }, []);
+  }, [isTouchDevice]);
 
   useEffect(() => {
     if (!isMounted) return;
@@ -35,11 +42,14 @@ export function WireframeCanvas() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const isMobile = window.innerWidth < 768;
-    const maxDpr = isMobile ? 1 : 2;
-    let dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
+    // M24: isMobile and dpr are now evaluated inside resize() so they
+    // re-read window.innerWidth on every resize/rotation event.
+    // Previously: const isMobile = window.innerWidth < 768 was captured
+    // once at mount — rotating phone from portrait→landscape left it stale.
+    let dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 768 ? 1 : 2);
 
     function resize() {
+      const isMobile = window.innerWidth < 768; // re-evaluate on every resize
       const el = canvas!.parentElement!;
       const w = el.clientWidth, h = el.clientHeight;
       dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1 : 2);
@@ -89,6 +99,8 @@ export function WireframeCanvas() {
       window.removeEventListener("resize", resize);
     };
   }, [isMounted]);
+
+  if (isTouchDevice) return <div className="services-wireframe" aria-hidden="true" />;
 
   return (
     <div ref={containerRef} className="services-wireframe" aria-hidden="true">

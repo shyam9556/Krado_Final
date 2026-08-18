@@ -58,7 +58,6 @@ const SERVICES: ServiceItem[] = [
 ];
 
 
-/* ─── Single service row ─── */
 function ServiceRow({
   service,
   isLast,
@@ -70,19 +69,14 @@ function ServiceRow({
 }) {
   const rowRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = useReducedMotion();
-  const [isActive, setIsActive] = useState(false);
-  const [isMobile, setIsMobile] = useState(() => {
-    if (typeof window !== "undefined") {
-      return window.matchMedia("(max-width: 1023px)").matches;
-    }
-    return false;
-  });
-  // No tilt state — transform written directly to DOM to avoid
-  // 60 React re-renders/sec during hover (same pattern as ValueCard).
+  // No isActive state — class toggled directly on DOM to avoid re-renders
+  // during scroll (ScrollTrigger.onToggle) and mouse events (enter/leave).
+  const [isMobile, setIsMobile] = useState(false);
 
-  /* Responsive detection */
+  /* Responsive detection — runs client-side only to avoid SSR hydration mismatch */
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 1023px)");
+    setIsMobile(mq.matches);
     const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
     mq.addEventListener("change", handler);
     return () => mq.removeEventListener("change", handler);
@@ -93,58 +87,54 @@ function ServiceRow({
     const el = rowRef.current;
     if (!el) return;
 
-    const triggers: ScrollTrigger[] = [];
+    const ctx = gsap.context(() => {
+      // Entrance animation
+      gsap.fromTo(
+        el,
+        { opacity: 0, y: 50, rotateX: prefersReducedMotion ? 0 : 3 },
+        {
+          opacity: 1,
+          y: 0,
+          rotateX: 0,
+          duration: prefersReducedMotion ? 0 : 1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: el,
+            start: "top 90%",
+            end: "top 60%",
+            toggleActions: "play none none none",
+            once: true,
+          },
+        }
+      );
 
-    // Entrance animation
-    const tween = gsap.fromTo(
-      el,
-      { opacity: 0, y: 50, rotateX: prefersReducedMotion ? 0 : 3 },
-      {
-        opacity: 1,
-        y: 0,
-        rotateX: 0,
-        duration: prefersReducedMotion ? 0 : 1,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: el,
-          start: "top 90%",
-          end: "top 60%",
-          toggleActions: "play none none none",
-          once: true,
-        },
-      }
-    );
-    if (tween.scrollTrigger) triggers.push(tween.scrollTrigger);
-
-    // Mobile: activate on scroll-into-view
-    if (isMobile) {
-      triggers.push(
+      // Mobile: activate on scroll-into-view — direct DOM, zero re-renders
+      if (isMobile) {
         ScrollTrigger.create({
           trigger: el,
           start: "top 70%",
           end: "bottom 30%",
           onToggle: (self) => {
-            setIsActive(self.isActive);
+            el.classList.toggle("is-active", self.isActive);
           },
-        })
-      );
-    }
+        });
+      }
+    }, el);
 
-    return () => {
-      triggers.forEach((st) => st.kill());
-    };
+    return () => ctx.revert();
   }, [isMobile, prefersReducedMotion]);
 
-  /* Desktop: hover state with 3D tilt */
+  /* Desktop: hover state with 3D tilt — direct DOM, zero re-renders */
   const handleMouseEnter = useCallback(() => {
-    if (!isMobile) setIsActive(true);
+    if (!isMobile && rowRef.current)
+      rowRef.current.classList.add("is-active");
   }, [isMobile]);
 
   const handleMouseLeave = useCallback(() => {
-    if (!isMobile) {
-      setIsActive(false);
+    if (!isMobile && rowRef.current) {
+      rowRef.current.classList.remove("is-active");
       // Reset tilt directly on DOM — CSS transition handles the smooth ease-out
-      if (rowRef.current) rowRef.current.style.transform = "";
+      rowRef.current.style.transform = "";
     }
   }, [isMobile]);
 
@@ -164,7 +154,7 @@ function ServiceRow({
   return (
     <div
       ref={rowRef}
-      className={`services-row ${isActive ? "is-active" : ""}`}
+      className="services-row"
       data-last={isLast ? "true" : undefined}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}

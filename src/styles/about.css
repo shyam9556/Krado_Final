@@ -17,6 +17,15 @@
     padding: 4rem 1.5rem 5rem;
   }
 
+  /* L4: Ultra-small screens (≤479px / iPhone SE, Galaxy S8).
+     4rem top + 5rem bottom = 144px padding on a 568px viewport = 25%.
+     Tighter padding lets content breathe instead of being buried. */
+  @media (max-width: 479px) {
+    .about-container {
+      padding: 2.5rem 1rem 3rem;
+    }
+  }
+
   @media (min-width: 768px) {
     .about-container {
       padding: 5rem 3rem 6rem;
@@ -104,7 +113,7 @@
     }
   }
 
-  /* Canvas Ã¢â‚¬â€ torus knot positioned behind manifesto text */
+  /* Canvas — torus knot positioned behind manifesto text */
 
   .about-manifesto-canvas {
     position: absolute;
@@ -127,7 +136,17 @@
     }
   }
 
-  /* Manifesto headline Ã¢â‚¬â€ massive Space Grotesk */
+  /* L12: CSS-level hide on touch-primary devices (phones/tablets).
+     Replaces the JS `if (isTouchDevice) return null` which caused the
+     wrapper to pop in on desktop after hydration (SSR returned null →
+     post-hydration re-render revealed the wrapper = layout shift). */
+  @media (pointer: coarse) {
+    .about-manifesto-canvas {
+      display: none;
+    }
+  }
+
+  /* Manifesto headline — massive Space Grotesk */
 
   .about-manifesto {
     position: relative;
@@ -175,14 +194,16 @@
     box-shadow: 0 0 12px rgba(255, 85, 0, 0.3);
   }
 
-  .about-manifesto__line:hover {
-    letter-spacing: 0.02em;
-    transform: translateX(8px);
-    text-shadow: 0 0 30px rgba(255, 85, 0, 0.12);
-  }
+  @media (hover: hover) {
+    .about-manifesto__line:hover {
+      letter-spacing: 0.02em;
+      transform: translateX(8px);
+      text-shadow: 0 0 30px rgba(255, 85, 0, 0.12);
+    }
 
-  .about-manifesto__line:hover::after {
-    transform: scaleX(1);
+    .about-manifesto__line:hover::after {
+      transform: scaleX(1);
+    }
   }
 
   @media (min-width: 768px) {
@@ -208,11 +229,13 @@
        glow looks identical; hover still brightens it on interaction. */
   }
 
-  .about-manifesto__accent:hover {
-    text-shadow: 0 0 50px rgba(255, 85, 0, 0.45),
-      0 0 100px rgba(255, 85, 0, 0.2),
-      0 0 150px rgba(255, 85, 0, 0.08);
-    animation: none;
+  @media (hover: hover) {
+    .about-manifesto__accent:hover {
+      text-shadow: 0 0 50px rgba(255, 85, 0, 0.45),
+        0 0 100px rgba(255, 85, 0, 0.2),
+        0 0 150px rgba(255, 85, 0, 0.08);
+      animation: none;
+    }
   }
 
   .about-manifesto__accent::after {
@@ -379,6 +402,28 @@
       transform: translateX(260%);
     }
   }
+
+  /* ── Touch device entrance animation ──
+     When card scrolls into view on mobile, JS adds .is-entered.
+     Replaces the hover shimmer that touch users can never trigger. */
+  @media (hover: none) and (pointer: coarse) {
+    .about-value-card.is-entered::before {
+      opacity: 1;
+      animation: cardShimmer 1.4s ease-out forwards;
+    }
+
+    .about-value-card.is-entered {
+      border-color: rgba(255, 85, 0, 0.18);
+      transition: border-color 0.6s ease;
+    }
+
+    .about-value-card.is-entered .about-value-card__icon-wrap {
+      background: rgba(255, 85, 0, 0.1);
+      border-color: rgba(255, 85, 0, 0.18);
+      transition: background 0.6s ease, border-color 0.6s ease;
+    }
+  }
+
 
   /* Ghost index number */
   .about-value-card__ghost-index {
@@ -549,7 +594,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 2.5rem 1rem;
+    padding: 2rem 0.75rem;
     text-align: center;
     position: relative;
     cursor: default;
@@ -652,7 +697,7 @@
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--text-muted);
-    white-space: nowrap;
+    white-space: normal;
     transition: color 0.3s ease;
   }
 
@@ -663,6 +708,7 @@
   @media (min-width: 768px) {
     .about-stat__label {
       font-size: 0.6875rem;
+      white-space: nowrap;
     }
   }
 
@@ -722,6 +768,16 @@
       transparent 100%
     );
   }
+
+  /* On small screens, 120px × 2 = 240px masked on a 320px viewport
+     leaving only 80px visible. Reduce to 40px (clamp to 12.5% of width). */
+  @media (max-width: 767px) {
+    .about-marquee::before,
+    .about-marquee::after {
+      width: clamp(32px, 12.5%, 60px);
+    }
+  }
+
 
   /* Primary track Ã¢â‚¬â€ scrolls left */
   .about-marquee__track {
@@ -834,8 +890,10 @@
     transition: border-color 0.3s ease;
   }
 
-  .about-cta__button:hover {
-    border-color: var(--accent-primary);
+  @media (hover: hover) {
+    .about-cta__button:hover {
+      border-color: var(--accent-primary);
+    }
   }
 
   .about-cta__sweep {
@@ -847,8 +905,10 @@
     transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1);
   }
 
-  .about-cta__button:hover .about-cta__sweep {
-    transform: scaleY(1);
+  @media (hover: hover) {
+    .about-cta__button:hover .about-cta__sweep {
+      transform: scaleY(1);
+    }
   }
 
   .about-cta__text,
@@ -858,9 +918,11 @@
     transition: color 0.3s ease;
   }
 
-  .about-cta__button:hover .about-cta__text,
-  .about-cta__button:hover .about-cta__arrow {
-    color: var(--background);
+  @media (hover: hover) {
+    .about-cta__button:hover .about-cta__text,
+    .about-cta__button:hover .about-cta__arrow {
+      color: var(--background);
+    }
   }
 
   .about-cta__arrow {
@@ -868,8 +930,10 @@
     transition: transform 0.3s ease, color 0.3s ease;
   }
 
-  .about-cta__button:hover .about-cta__arrow {
-    transform: translateX(4px);
+  @media (hover: hover) {
+    .about-cta__button:hover .about-cta__arrow {
+      transform: translateX(4px);
+    }
   }
 
   /* Ã¢â€â‚¬Ã¢â€â‚¬ Background glow orbs Ã¢â‚¬â€ atmospheric Ã¢â€â‚¬Ã¢â€â‚¬ */
@@ -919,16 +983,20 @@
     text-shadow: none;
   }
 
-  :root:not(.dark) .about-manifesto__accent:hover {
-    text-shadow: none;
+  @media (hover: hover) {
+    :root:not(.dark) .about-manifesto__accent:hover {
+      text-shadow: none;
+    }
   }
 
   :root:not(.dark) .about-manifesto__accent::after {
     box-shadow: none;
   }
 
-  :root:not(.dark) .about-manifesto__line:hover {
-    text-shadow: none;
+  @media (hover: hover) {
+    :root:not(.dark) .about-manifesto__line:hover {
+      text-shadow: none;
+    }
   }
 
   :root:not(.dark) .about-manifesto__line::after {
@@ -997,9 +1065,11 @@
   }
 
   /* CTA hover text — design token */
-  :root:not(.dark) .about-cta__button:hover .about-cta__text,
-  :root:not(.dark) .about-cta__button:hover .about-cta__arrow {
-    color: var(--background);
+  @media (hover: hover) {
+    :root:not(.dark) .about-cta__button:hover .about-cta__text,
+    :root:not(.dark) .about-cta__button:hover .about-cta__arrow {
+      color: var(--background);
+    }
   }
 
   /* ==========================================================
@@ -1077,5 +1147,54 @@
     .about-stat__number {
       animation: none !important;
       -webkit-text-fill-color: var(--text-primary) !important;
+    }
+  }
+
+  /* ── Touch device overrides ──
+     Neutralize hover effects that trigger on first tap and look broken.
+     @media(hover:none) matches phones & tablets accurately. */
+  @media (hover: none) and (pointer: coarse) {
+
+    /* ValueCard: disable hover styles — they trigger on first tap */
+    .about-value-card:hover,
+    .about-value-card.is-hovered {
+      border-color: rgba(255, 255, 255, 0.07);
+      background: linear-gradient(135deg, rgba(255,255,255,0.035) 0%, rgba(255,255,255,0.012) 100%);
+      box-shadow: none;
+      transform: none !important;
+    }
+
+    /* No shimmer sweep or cursor spotlight without a mouse */
+    .about-value-card::before,
+    .about-value-card__glow {
+      display: none;
+    }
+
+    /* Disable canvas — no mouse interactivity on touch, high CPU cost */
+    .about-manifesto-canvas {
+      display: none;
+    }
+
+    /* Remove stat hover jank on tap */
+    .about-stat:hover {
+      transform: none;
+      background: none;
+    }
+    .about-stat:hover .about-stat__accent-dot {
+      opacity: 0.5;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Marquee items — no hover state on touch */
+    .about-marquee__item:hover {
+      color: var(--text-muted);
+      transform: none;
+      text-shadow: none;
+    }
+    .about-marquee__item:hover .about-marquee__dot {
+      opacity: 0.4;
+      transform: none;
+      text-shadow: none;
     }
   }

@@ -63,3 +63,79 @@
       0 0 10px var(--accent-primary),
       0 0 20px var(--accent-primary) !important;
   }
+
+  /* ==========================================================
+     HERO — CTA Button Hover Effects (pointer devices only)
+     ========================================================== */
+
+  /* ── "Start a Project" primary button ── */
+  .hero-cta-primary {
+    border-color: transparent;
+    transition: border-color 0.3s ease;
+  }
+
+  .hero-cta-primary__sweep {
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1);
+  }
+
+  .hero-cta-primary__text,
+  .hero-cta-primary__arrow {
+    transition: color 0.3s ease;
+  }
+
+  .hero-cta-primary__arrow {
+    transition: transform 0.3s ease, color 0.3s ease;
+  }
+
+  @media (hover: hover) {
+    .hero-cta-primary:hover {
+      border-color: var(--accent-primary);
+    }
+
+    .hero-cta-primary:hover .hero-cta-primary__sweep {
+      transform: scaleY(1);
+    }
+
+    .hero-cta-primary:hover .hero-cta-primary__text,
+    .hero-cta-primary:hover .hero-cta-primary__arrow {
+      color: var(--background);
+    }
+
+    .hero-cta-primary:hover .hero-cta-primary__arrow {
+      transform: translateX(4px);
+    }
+  }
+
+  /* ── "View Our Work" secondary button ── */
+  .hero-cta-secondary__slide-top {
+    transition: transform 0.3s cubic-bezier(0.76, 0, 0.24, 1);
+  }
+
+  .hero-cta-secondary__slide-bottom {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translateY(120%);
+    transition: transform 0.3s cubic-bezier(0.76, 0, 0.24, 1);
+    color: var(--accent-primary);
+  }
+
+  .hero-cta-secondary__arrow {
+    transition: transform 0.3s ease;
+  }
+
+  @media (hover: hover) {
+    .hero-cta-secondary:hover .hero-cta-secondary__slide-top {
+      transform: translateY(-120%);
+    }
+
+    .hero-cta-secondary:hover .hero-cta-secondary__slide-bottom {
+      transform: translateY(0);
+    }
+
+    .hero-cta-secondary:hover .hero-cta-secondary__arrow {
+      transform: translateX(4px) translateY(-4px);
+    }
+  }

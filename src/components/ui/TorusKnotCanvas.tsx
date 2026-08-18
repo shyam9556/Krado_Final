@@ -49,7 +49,10 @@ export function TorusKnotCanvas() {
   const timeRef = useRef(0);
   const lastTimeRef = useRef(0);
 
-  const [isTouchDevice, setIsTouchDevice] = useState(true);
+  // L12: Initialize as false (desktop assumption) so SSR renders the wrapper div.
+  // Avoids the "pop-in" on desktop where useState(true) caused SSR to return null
+  // and the wrapper appeared only after hydration. CSS hides it on touch devices.
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -216,11 +219,11 @@ export function TorusKnotCanvas() {
     };
   }, [isTouchDevice, isMounted]);
 
-  if (isTouchDevice) return null;
-
+  // L12: Render the wrapper unconditionally — CSS (pointer:coarse) hides it on touch.
+  // Previously: if (isTouchDevice) return null — caused desktop pop-in after hydration.
   return (
     <div ref={wrapperRef} className="about-manifesto-canvas" aria-hidden="true">
-      {isMounted && (
+      {isMounted && !isTouchDevice && (
         <canvas ref={canvasRef} style={{ width: "100%", height: "100%" }} />
       )}
     </div>

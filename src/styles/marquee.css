@@ -33,12 +33,14 @@
   z-index: 5;
 }
 
-.project-marquee-card:hover {
-  border-color: rgba(34, 211, 238, 0.4);
-}
+@media (hover: hover) {
+  .project-marquee-card:hover {
+    border-color: rgba(34, 211, 238, 0.4);
+  }
 
-.project-marquee-card:hover::before {
-  opacity: 1;
+  .project-marquee-card:hover::before {
+    opacity: 1;
+  }
 }
 
 .project-marquee-overlay {
@@ -60,8 +62,10 @@
   }
 }
 
-.project-marquee-card:hover .project-marquee-overlay {
-  opacity: 1;
+@media (hover: hover) {
+  .project-marquee-card:hover .project-marquee-overlay {
+    opacity: 1;
+  }
 }
 
 .project-marquee-title {
@@ -81,8 +85,10 @@
   }
 }
 
-.project-marquee-card:hover .project-marquee-title {
-  transform: translateY(0);
+@media (hover: hover) {
+  .project-marquee-card:hover .project-marquee-title {
+    transform: translateY(0);
+  }
 }
 
 .project-marquee-meta {
@@ -95,8 +101,28 @@
   transition-delay: 0.04s;
 }
 
-.project-marquee-card:hover .project-marquee-meta {
-  transform: translateY(0);
+@media (hover: hover) {
+  .project-marquee-card:hover .project-marquee-meta {
+    transform: translateY(0);
+  }
+}
+
+/* M18: Touch devices — overlay is always partially visible.
+   On touch, :hover never fires, so the overlay stays at opacity:0 and
+   users can't see project names while swiping. Show it persistently at
+   reduced opacity so names and categories are always readable.
+   The hover reveal animation (opacity:0 -> 1) is preserved on pointer
+   devices via @media(hover:hover) above. */
+@media (hover: none) {
+  .project-marquee-overlay {
+    opacity: 0.9;
+  }
+  .project-marquee-title {
+    transform: translateY(0); /* cancel the slide-up offset */
+  }
+  .project-marquee-meta {
+    transform: translateY(0); /* cancel the slide-up offset */
+  }
 }
 
 .project-marquee-badge {
@@ -207,8 +233,10 @@
 }
 
 /* Hover glow — toned down */
-:root:not(.dark) .project-marquee-card:hover {
-  border-color: rgba(34, 211, 238, 0.3);
+@media (hover: hover) {
+  :root:not(.dark) .project-marquee-card:hover {
+    border-color: rgba(34, 211, 238, 0.3);
+  }
 }
 
 /* Shimmer bg */

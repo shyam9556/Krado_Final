@@ -5,6 +5,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { gsap } from "gsap";
 import { useLenis } from "@/components/layout/smooth-scroll-provider";
+import { lockScroll, unlockScroll } from "@/lib/scroll-lock";
 
 const INTRO_SESSION_KEY = "krado-intro-seen";
 
@@ -24,11 +25,12 @@ export function DecodeIntro() {
   // Lock scroll
   useEffect(() => {
     if (shouldShow) {
-      document.body.style.overflow = "hidden";
+      lockScroll();
       lenis?.stop();
     }
     return () => {
-      document.body.style.overflow = "";
+      unlockScroll();
+      lenis?.start();
     };
   }, [shouldShow, lenis]);
 
@@ -43,10 +45,8 @@ export function DecodeIntro() {
   }, []);
 
   const handleExitComplete = useCallback(() => {
-    document.body.style.overflow = "";
-    lenis?.start();
     setShouldShow(false);
-  }, [lenis]);
+  }, []);
 
   useEffect(() => {
     if (!shouldShow || shouldShow === null) return;

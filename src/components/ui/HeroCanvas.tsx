@@ -143,10 +143,19 @@ export function HeroCanvas() {
   const initedRef = useRef(false);
   const { introComplete } = useIntroState();
   const [isMounted, setIsMounted] = useState(true);
+  const [isTouchDevice, setIsTouchDevice] = useState(true);
+
+  // Detect touch device — skip canvas entirely on mobile
+  useEffect(() => {
+    setIsTouchDevice(window.matchMedia("(pointer: coarse)").matches);
+  }, []);
 
   // Unmount canvas entirely when hero scrolls out of view.
   // Frees Canvas 2D context + stops all RAF callbacks.
+  // Depends on isTouchDevice because wrapperRef is null on initial render
+  // (when isTouchDevice defaults to true). Needs to re-run once detection completes.
   useEffect(() => {
+    if (isTouchDevice) return; // Touch devices skip canvas entirely
     const el = wrapperRef.current;
     if (!el) return;
     const observer = new IntersectionObserver(
@@ -155,7 +164,7 @@ export function HeroCanvas() {
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, []);
+  }, [isTouchDevice]);
 
   const initScene = useCallback((w: number, h: number) => {
     // ── Create shapes ──
@@ -305,19 +314,22 @@ export function HeroCanvas() {
       timeRef.current += 0.016;
       const time = timeRef.current;
 
-      // Smooth mouse interpolation
+      // Smooth mouse interpolation — only lerp when mouse is actively tracked.
+      // When inactive, freeze smoothMouse so shapes near screen center
+      // don't receive a false proximity boost before any cursor movement.
       const sm = smoothMouseRef.current;
-      let targetX = mouseRef.current.active ? mouseRef.current.x : 0.5;
-      let targetY = mouseRef.current.active ? mouseRef.current.y : 0.5;
-      
-      if (isNaN(targetX)) targetX = 0.5;
-      if (isNaN(targetY)) targetY = 0.5;
-
-      sm.x = lerp(sm.x, targetX, 0.04);
-      sm.y = lerp(sm.y, targetY, 0.04);
-
-      if (isNaN(sm.x)) sm.x = 0.5;
-      if (isNaN(sm.y)) sm.y = 0.5;
+      if (mouseRef.current.active) {
+        let targetX = mouseRef.current.x;
+        let targetY = mouseRef.current.y;
+        if (isNaN(targetX)) targetX = sm.x;
+        if (isNaN(targetY)) targetY = sm.y;
+        sm.x = lerp(sm.x, targetX, 0.04);
+        sm.y = lerp(sm.y, targetY, 0.04);
+        if (isNaN(sm.x)) sm.x = 0.5;
+        if (isNaN(sm.y)) sm.y = 0.5;
+      }
+      // When inactive: smoothMouse stays wherever it was last, or at (0.5, 0.5)
+      // but proximity/glow checks are already gated on mouseRef.current.active.
 
       const mouseWorldX = sm.x * w;
       const mouseWorldY = sm.y * h;
@@ -478,9 +490,11 @@ export function HeroCanvas() {
     };
   }, [initScene, introComplete, isMounted]);
 
+  // Single unified return — ref always attached so IntersectionObserver can find it.
+  // Canvas only renders on non-touch devices when hero is in/near viewport.
   return (
     <div ref={wrapperRef} className="hero-canvas-3d" aria-hidden="true">
-      {isMounted && (
+      {!isTouchDevice && isMounted && (
         <canvas
           ref={canvasRef}
           style={{ width: "100%", height: "100%" }}

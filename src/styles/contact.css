@@ -159,13 +159,15 @@
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.contact-email-link:hover {
-  color: var(--accent-primary);
-}
+@media (hover: hover) {
+  .contact-email-link:hover {
+    color: var(--accent-primary);
+  }
 
-.contact-email-link:hover::after {
-  transform: scaleX(1);
-  transform-origin: left;
+  .contact-email-link:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
 }
 
 .contact-email-arrow {
@@ -174,8 +176,10 @@
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.contact-email-link:hover .contact-email-arrow {
-  transform: translateX(6px);
+@media (hover: hover) {
+  .contact-email-link:hover .contact-email-arrow {
+    transform: translateX(6px);
+  }
 }
 
 /* Form Panel (Right) */
@@ -218,7 +222,14 @@
 .form-service-chip,
 .form-budget-chip {
   position: relative;
-  padding: 0.625rem 1.25rem;
+  /* M19: inline-flex + align-items:center ensures the 44px min-height
+     is visually respected in Safari (plain <button> height can collapse
+     without flex context) and centers text within the larger hit area. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.25rem;
+  min-height: 44px;
   font-family: var(--font-sans);
   font-size: 0.85rem;
   font-weight: 500;
@@ -242,10 +253,22 @@
   z-index: 1;
 }
 
-.form-service-chip:hover,
-.form-budget-chip:hover {
+@media (hover: hover) {
+  .form-service-chip:hover,
+  .form-budget-chip:hover {
+    color: var(--text-primary);
+    border-color: rgba(255, 85, 0, 0.25);
+  }
+}
+
+/* M19 / Issue #51: :active tap feedback for touch devices.
+   Since :hover never fires on touch, chips had zero visual
+   confirmation on tap. Scale + border hint confirms selection. */
+.form-service-chip:active,
+.form-budget-chip:active {
+  transform: scale(0.97);
+  border-color: rgba(255, 85, 0, 0.3);
   color: var(--text-primary);
-  border-color: rgba(255, 85, 0, 0.25);
 }
 
 .form-service-chip.is-selected,
@@ -303,10 +326,15 @@
 .form-text-input,
 .form-text-area {
   width: 100%;
+  /* M20: box-sizing:border-box ensures padding is included in
+     the height calculation — without it, padding + border can
+     push the element below the 44px min-height on some browsers. */
+  box-sizing: border-box;
   background: transparent;
   border: none;
   border-bottom: 1px solid var(--border);
-  padding: 0.5rem 0;
+  padding: 0.75rem 0;
+  min-height: 44px;
   font-family: var(--font-sans);
   font-size: 1rem;
   color: var(--text-primary);
@@ -315,7 +343,7 @@
 }
 
 .form-text-area {
-  resize: none;
+  resize: vertical;
 }
 
 .form-input-border-line {
@@ -366,13 +394,24 @@
   z-index: 1;
 }
 
-.form-submit-btn:hover {
-  color: #fff;
+@media (hover: hover) {
+  .form-submit-btn:hover {
+    color: #fff;
+  }
+
+  .form-submit-btn:hover .form-submit-btn__sweep {
+    opacity: 1;
+  }
+
+  .form-submit-btn:hover .form-submit-spinner {
+    border-color: rgba(255, 255, 255, 0.2);
+    border-top-color: #fff;
+  }
 }
 
-.form-submit-btn:hover .form-submit-btn__sweep {
-  opacity: 1;
-}
+/* Submit button tap feedback is handled by the <Magnetic> wrapper's
+   whileTap={{ scale: 0.97 }} — no CSS :active scale needed here.
+   (Chips keep their :active rules because they're not in Magnetic.) */
 
 .form-submit-btn.is-success {
   background-color: #22c55e !important;
@@ -388,71 +427,11 @@
   animation: spin-loader 0.8s infinite linear;
 }
 
-.form-submit-btn:hover .form-submit-spinner {
-  border-color: rgba(255, 255, 255, 0.2);
-  border-top-color: #fff;
-}
-
 .form-success-alert {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 0.25rem;
-}
-
-/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
-   MOBILE PERFORMANCE: Disable hover effects on touch devices
-   @media (hover: none) matches phones & tablets accurately
-   Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
-@media (hover: none) and (pointer: coarse) {
-
-  /* ValueCard: disable hover styles Ã¢â‚¬â€ they trigger on first tap, look broken */
-  .about-value-card:hover,
-  .about-value-card.is-hovered {
-    border-color: rgba(255, 255, 255, 0.07);
-    background: linear-gradient(135deg, rgba(255,255,255,0.035) 0%, rgba(255,255,255,0.012) 100%);
-    box-shadow: none;
-    transform: none !important;
-  }
-
-  /* No shimmer sweep or cursor spotlight without a mouse */
-  .about-value-card::before,
-  .about-value-card__glow {
-    display: none;
-  }
-
-  /* Disable canvas Ã¢â‚¬â€ no mouse interactivity on touch, high CPU cost */
-  .about-manifesto-canvas {
-    display: none;
-  }
-
-  /* Floating tech icons in Work section Ã¢â‚¬â€ animated via GSAP, not useful on mobile */
-  .work-float-icon {
-    display: none;
-  }
-
-  /* Remove stat hover jank on tap */
-  .about-stat:hover {
-    transform: none;
-    background: none;
-  }
-  .about-stat:hover .about-stat__accent-dot {
-    opacity: 0.5;
-    transform: none;
-    box-shadow: none;
-  }
-
-  /* Marquee items Ã¢â‚¬â€ no hover state on touch */
-  .about-marquee__item:hover {
-    color: var(--text-muted);
-    transform: none;
-    text-shadow: none;
-  }
-  .about-marquee__item:hover .about-marquee__dot {
-    opacity: 0.4;
-    transform: none;
-    text-shadow: none;
-  }
 }
 
 /* ==========================================================

@@ -10,6 +10,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useLenis } from "@/components/layout/smooth-scroll-provider";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { MobileNav } from "@/components/layout/MobileNav";
+import { lockScroll, unlockScroll } from "@/lib/scroll-lock";
 import { useIntroState } from "@/components/layout/intro-state-provider";
 import { Magnetic } from "@/components/ui/Magnetic";
 
@@ -114,13 +115,13 @@ export function Navbar() {
   const openMobile = useCallback(() => {
     setMobileOpen(true);
     lenis?.stop();
-    document.body.style.overflow = "hidden";
+    lockScroll();
   }, [lenis]);
 
   const closeMobile = useCallback(() => {
     setMobileOpen(false);
     lenis?.start();
-    document.body.style.overflow = "";
+    unlockScroll();
     setTimeout(() => hamburgerRef.current?.focus(), 60);
   }, [lenis]);
 
@@ -216,7 +217,7 @@ export function Navbar() {
             <button
               ref={hamburgerRef}
               type="button"
-              className="lg:hidden flex flex-col justify-center items-center w-10 h-10 gap-1.5 z-[60]"
+              className="lg:hidden flex flex-col justify-center items-center w-11 h-11 gap-1.5 z-[60]"
               onClick={mobileOpen ? closeMobile : openMobile}
               aria-label={mobileOpen ? "Close menu" : "Open menu"}
               aria-expanded={mobileOpen}

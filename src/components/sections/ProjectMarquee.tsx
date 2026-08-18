@@ -2,7 +2,7 @@
 
 import "@/styles/marquee.css";
 
-import { useRef, useEffect, useCallback, memo } from "react";
+import { useRef, useEffect, useCallback, useState, memo } from "react";
 import { useReducedMotion } from "framer-motion";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -42,7 +42,7 @@ function isActivelyScrolling(): boolean {
   return performance.now() - _lastScrollTime < SCROLL_IDLE_MS;
 }
 
-const MarqueeTile = memo(function MarqueeTile({ project }: { project: Project }) {
+const MarqueeTile = memo(function MarqueeTile({ project, isTouch }: { project: Project; isTouch: boolean }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   /* rAF gate — limits mousemove style updates to 1 per frame */
@@ -93,9 +93,9 @@ const MarqueeTile = memo(function MarqueeTile({ project }: { project: Project })
     <div
       ref={cardRef}
       className="project-marquee-card group relative h-[190px] w-[296px] shrink-0 overflow-hidden sm:h-[220px] sm:w-[340px] lg:h-[270px] lg:w-[420px]"
-      onMouseMove={handleMouseMove}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      onMouseMove={isTouch ? undefined : handleMouseMove}
+      onMouseEnter={isTouch ? undefined : handleMouseEnter}
+      onMouseLeave={isTouch ? undefined : handleMouseLeave}
     >
       {/* ── Layer 1: WebP poster — always visible ── */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -107,15 +107,17 @@ const MarqueeTile = memo(function MarqueeTile({ project }: { project: Project })
         fetchPriority="low"
       />
 
-      {/* ── Layer 2: MP4 video — no src at idle, set only on hover (zero overhead) ── */}
-      <video
-        ref={videoRef}
-        loop
-        muted
-        playsInline
-        preload="none"
-        className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-500 ease-out group-hover:opacity-100"
-      />
+      {/* ── Layer 2: MP4 video — desktop only, no src at idle, set only on hover ── */}
+      {!isTouch && (
+        <video
+          ref={videoRef}
+          loop
+          muted
+          playsInline
+          preload="none"
+          className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-500 ease-out group-hover:opacity-100"
+        />
+      )}
 
       {/* ── Layer 3: Decorative gradient overlay ── */}
       <div className="pointer-events-none absolute inset-0 z-10 project-marquee-gradient" />
@@ -135,9 +137,11 @@ const MarqueeTile = memo(function MarqueeTile({ project }: { project: Project })
 const MarqueeRow = memo(function MarqueeRow({
   projects,
   rowRef,
+  isTouch,
 }: {
   projects: Project[];
   rowRef: React.RefObject<HTMLDivElement | null>;
+  isTouch: boolean;
 }) {
   return (
     <div ref={rowRef} className="flex gap-4">
@@ -145,6 +149,7 @@ const MarqueeRow = memo(function MarqueeRow({
         <MarqueeTile
           key={`${project.name}-${index}`}
           project={project}
+          isTouch={isTouch}
         />
       ))}
     </div>
@@ -156,6 +161,11 @@ export function ProjectMarquee() {
   const rowOneRef = useRef<HTMLDivElement>(null);
   const rowTwoRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = useReducedMotion();
+  const [isTouch, setIsTouch] = useState(true);
+
+  useEffect(() => {
+    setIsTouch(window.matchMedia("(pointer: coarse)").matches);
+  }, []);
 
   /* ── GSAP scroll-driven parallax ── */
   useEffect(() => {
@@ -171,11 +181,13 @@ export function ProjectMarquee() {
     const triggers: ScrollTrigger[] = [];
 
     // Row 1: slides right as user scrolls down
+    // M17: use vw strings so travel scales with viewport.
+    // Fixed px (±220/420) overshot on 320px phones, too subtle on 4K.
     const tween1 = gsap.fromTo(
       rowOne,
-      { x: -220 },
+      { x: "-20vw" },
       {
-        x: 420,
+        x: "38vw",
         ease: "none",
         scrollTrigger: {
           trigger: section,
@@ -193,9 +205,9 @@ export function ProjectMarquee() {
     // Row 2: slides left as user scrolls down
     const tween2 = gsap.fromTo(
       rowTwo,
-      { x: 220 },
+      { x: "20vw" },
       {
-        x: -420,
+        x: "-38vw",
         ease: "none",
         scrollTrigger: {
           trigger: section,
@@ -227,8 +239,8 @@ export function ProjectMarquee() {
       </div>
 
       <div className="flex flex-col gap-4">
-        <MarqueeRow projects={ROW_ONE} rowRef={rowOneRef} />
-        <MarqueeRow projects={ROW_TWO} rowRef={rowTwoRef} />
+        <MarqueeRow projects={ROW_ONE} rowRef={rowOneRef} isTouch={isTouch} />
+        <MarqueeRow projects={ROW_TWO} rowRef={rowTwoRef} isTouch={isTouch} />
       </div>
     </div>
   );

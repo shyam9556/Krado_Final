@@ -207,19 +207,41 @@ export function Testimonials() {
   /* ──────────────────────────────────────────────────────────
      Swipe — native pointer events, no drag library
      ────────────────────────────────────────────────────────── */
-  const swipeRef = useRef<number | null>(null);
+  const swipeRef = useRef<{ x: number; y: number } | null>(null);
 
   const onPointerDown = useCallback((e: React.PointerEvent) => {
-    swipeRef.current = e.clientX;
+    swipeRef.current = { x: e.clientX, y: e.clientY };
+    // M16: Pause autoplay while the user is touching — prevents a
+    // 7s timer from firing mid-read / mid-swipe and interrupting them.
+    if (autoplayRef.current) clearTimeout(autoplayRef.current);
+    // Freeze the progress bar so it doesn't advance while paused
+    const fill = progressRef.current;
+    if (fill) fill.classList.remove("is-running");
   }, []);
 
   const onPointerUp = useCallback((e: React.PointerEvent) => {
     if (swipeRef.current === null) return;
-    const diff = e.clientX - swipeRef.current;
+    const deltaX = e.clientX - swipeRef.current.x;
+    const deltaY = e.clientY - swipeRef.current.y;
     swipeRef.current = null;
-    if (Math.abs(diff) < 60) return;
-    if (diff < 0) handleNext(); else handlePrev();
-  }, [handleNext, handlePrev]);
+    /* Only trigger if it's a deliberate horizontal swipe:
+       horizontal distance > 60px AND greater than vertical distance */
+    if (Math.abs(deltaX) < 60 || Math.abs(deltaX) < Math.abs(deltaY)) {
+      // Not a swipe — just lift. Restart autoplay from where we paused.
+      resetAutoplay();
+      return;
+    }
+    if (deltaX < 0) handleNext(); else handlePrev();
+    // resetAutoplay() is already called inside handleNext/handlePrev
+  }, [handleNext, handlePrev, resetAutoplay]);
+
+  /* Pointer cancel — OS/browser cancelled the touch gesture (system gesture,
+     incoming call, drag outside viewport). Restart autoplay so it doesn't
+     stay frozen permanently. */
+  const onPointerCancel = useCallback(() => {
+    swipeRef.current = null;
+    resetAutoplay();
+  }, [resetAutoplay]);
 
   /* ──────────────────────────────────────────────────────────
      Entrance Animation (ScrollTrigger, once: true)
@@ -274,6 +296,7 @@ export function Testimonials() {
       aria-label="Client Testimonials"
       onPointerDown={onPointerDown}
       onPointerUp={onPointerUp}
+      onPointerCancel={onPointerCancel}
     >
       {/* Background */}
       <div className="testimonials-bg" aria-hidden="true">

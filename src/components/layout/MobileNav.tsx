@@ -75,6 +75,20 @@ export function MobileNav({
   const overlayRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = useReducedMotion();
 
+  /* Screen reader isolation — hide page content from VoiceOver/TalkBack while menu is open */
+  useEffect(() => {
+    const main = document.getElementById("main-content");
+    if (!main) return;
+    if (isOpen) {
+      main.setAttribute("aria-hidden", "true");
+    } else {
+      main.removeAttribute("aria-hidden");
+    }
+    return () => {
+      main.removeAttribute("aria-hidden");
+    };
+  }, [isOpen]);
+
   useEffect(() => {
     if (!isOpen) return;
 
@@ -144,7 +158,7 @@ export function MobileNav({
 
           {/* Drawer */}
           <motion.div
-            className="relative w-full max-w-sm h-full bg-surface border-l border-border shadow-2xl overflow-hidden flex flex-col justify-center px-8"
+            className="relative w-full max-w-sm h-full bg-surface border-l border-border shadow-2xl overflow-y-auto flex flex-col justify-start px-8 py-16"
             variants={prefersReducedMotion ? overlayVariants : drawerVariants}
             initial="hidden"
             animate="visible"

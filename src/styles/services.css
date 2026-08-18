@@ -222,6 +222,17 @@
     }
   }
 
+  /* L5: At ≤479px (iPhone SE, Galaxy S8), clamp(4rem,18vw,6rem) always
+     hits the 4rem floor since 18vw=57.6px < 64px=4rem. The 64px ghost
+     number bleeds over the 3.5rem index column into the service title.
+     Reduce font and push further off-left to stay purely decorative. */
+  @media (max-width: 479px) {
+    .services-row__ghost-index {
+      font-size: clamp(2.5rem, 12vw, 3.5rem);
+      left: -1rem;
+    }
+  }
+
   /* Ã¢â€â‚¬Ã¢â€â‚¬ Index number Ã¢â‚¬â€ Geist Mono Ã¢â€â‚¬Ã¢â€â‚¬ */
 
   .services-row__index {
@@ -290,7 +301,7 @@
   }
 
   .services-row.is-active .services-row__desc {
-    max-height: 5rem;
+    max-height: 12rem;
     opacity: 1;
     transform: translateY(0);
     margin-top: 0.625rem;
@@ -303,6 +314,7 @@
     }
 
     .services-row.is-active .services-row__desc {
+      max-height: 5rem;
       margin-top: 0.75rem;
     }
   }
@@ -398,11 +410,12 @@
     }
   }
 
-  /* Ã¢â€â‚¬Ã¢â€â‚¬ Footer flourish Ã¢â€â‚¬Ã¢â€â‚¬ */
+  /* ─ Footer flourish ─ */
 
   .services-footer {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 1.5rem;
     margin-top: 3.5rem;
     padding-top: 2rem;
@@ -450,8 +463,10 @@
     transition: color 0.3s ease;
   }
 
-  .services-footer__link:hover {
-    color: var(--accent-primary);
+  @media (hover: hover) {
+    .services-footer__link:hover {
+      color: var(--accent-primary);
+    }
   }
 
   .services-footer__link-arrow {
@@ -459,9 +474,11 @@
     transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), color 0.3s ease;
   }
 
-  .services-footer__link:hover .services-footer__link-arrow {
-    transform: translateX(4px);
-    color: var(--accent-primary);
+  @media (hover: hover) {
+    .services-footer__link:hover .services-footer__link-arrow {
+      transform: translateX(4px);
+      color: var(--accent-primary);
+    }
   }
 
   /* ==========================================================

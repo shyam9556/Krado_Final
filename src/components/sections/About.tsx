@@ -103,9 +103,10 @@ const ManifestoLine = memo(function ManifestoLine({
   const spanRef = useRef<HTMLSpanElement>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const iterRef = useRef(0);
+  const hasPlayedRef = useRef(false); // prevent re-fire on scroll back
   const prefersReducedMotion = useReducedMotion();
 
-  const handleMouseEnter = useCallback(() => {
+  const triggerScramble = useCallback(() => {
     if (prefersReducedMotion) return;
     iterRef.current = 0;
 
@@ -134,6 +135,32 @@ const ManifestoLine = memo(function ManifestoLine({
       }
     }, 40);
   }, [text, prefersReducedMotion]);
+
+  const handleMouseEnter = useCallback(() => {
+    triggerScramble();
+  }, [triggerScramble]);
+
+  // On touch devices, fire scramble once when line enters viewport.
+  // Gated on (hover: none) — desktop never attaches this observer.
+  useEffect(() => {
+    const isTouch =
+      typeof window !== "undefined" &&
+      window.matchMedia("(hover: none)").matches;
+    if (!isTouch || prefersReducedMotion || !spanRef.current) return;
+    const el = spanRef.current;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasPlayedRef.current) {
+          hasPlayedRef.current = true;
+          triggerScramble();
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.5 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [triggerScramble, prefersReducedMotion]);
 
   const handleMouseLeave = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
@@ -173,6 +200,10 @@ function ValueCard({ value, index }: { value: ValueItem; index: number }) {
   // Direct DOM mutation — zero React state, zero re-renders on mousemove
   const handleMouseMove = useCallback(
     (e: React.MouseEvent) => {
+      // L3: Guard against synthesized mousemove on touch devices (Chrome/Android polyfill).
+      // The value card has its own touch path (IntersectionObserver shimmer) so
+      // the mouse tilt path must stay silent on pointer:coarse hardware.
+      if (window.matchMedia("(pointer: coarse)").matches) return;
       if (prefersReducedMotion || !cardRef.current) return;
       const rect = cardRef.current.getBoundingClientRect();
       const x = (e.clientX - rect.left) / rect.width - 0.5;
@@ -201,6 +232,29 @@ function ValueCard({ value, index }: { value: ValueItem; index: number }) {
     if (glowRef.current) {
       glowRef.current.style.opacity = "0";
     }
+  }, []);
+
+  // On touch devices, play entrance shimmer once when card scrolls into view.
+  // Adds .is-entered class which CSS @media(hover:none) targets with the
+  // cardShimmer animation — replaces hover feedback for mobile users.
+  useEffect(() => {
+    const isTouch =
+      typeof window !== "undefined" &&
+      window.matchMedia("(hover: none)").matches;
+    if (!isTouch || !cardRef.current) return;
+
+    const el = cardRef.current;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add("is-entered");
+          observer.disconnect(); // fire once only
+        }
+      },
+      { threshold: 0.3 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
   }, []);
 
   const Icon = value.icon;
@@ -390,6 +444,10 @@ export function About() {
 
   const handleMouseMove = useCallback(
     (e: React.MouseEvent) => {
+      // L3: Guard against synthesized mousemove on touch devices.
+      // The manifesto translate(${x*12}px, ${y*8}px) parallax would wobble
+      // the hero text on Android Chrome which polyfills mousemove from touch.
+      if (window.matchMedia("(pointer: coarse)").matches) return;
       if (prefersReducedMotion || !sectionRef.current) return;
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
       const clientX = e.clientX;
