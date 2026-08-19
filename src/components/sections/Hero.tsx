@@ -23,18 +23,21 @@ export function Hero() {
   /* ── Direct DOM tilt on mouse move — no React style conflict,
      no Framer Motion RAF, no GSAP CSSPlugin. CSS transition handles reset. ── */
   const tiltRef = useRef<HTMLDivElement>(null);
+  const isCoarsePointer = useRef(false);
+
+  // Evaluate pointer type once on mount — reading a ref is zero-cost vs
+  // calling window.matchMedia() on every mousemove (60+ times/sec).
+  useEffect(() => {
+    isCoarsePointer.current = window.matchMedia("(pointer: coarse)").matches;
+  }, []);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    // L2: Guard against synthesized mousemove events on touch devices.
-    // Chrome on Android and some WebViews polyfill mousemove from touch —
-    // causes hero to tilt while scrolling. pointer:coarse = touch-first hardware.
-    if (window.matchMedia("(pointer: coarse)").matches) return;
+    if (isCoarsePointer.current) return;
     if (prefersReducedMotion || !tiltRef.current) return;
     const { clientX, clientY } = e;
     const { innerWidth, innerHeight } = window;
     const x = (clientX / innerWidth) * 2 - 1;
     const y = (clientY / innerHeight) * 2 - 1;
-    // perspective() must be on the same element as rotateX/Y
     tiltRef.current.style.transform =
       `perspective(1000px) rotateX(${y * -3}deg) rotateY(${x * 3}deg)`;
   }, [prefersReducedMotion]);

@@ -196,14 +196,16 @@ function ValueCard({ value, index }: { value: ValueItem; index: number }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = useReducedMotion();
+  const isCoarsePointer = useRef(false);
+
+  useEffect(() => {
+    isCoarsePointer.current = window.matchMedia("(pointer: coarse)").matches;
+  }, []);
 
   // Direct DOM mutation — zero React state, zero re-renders on mousemove
   const handleMouseMove = useCallback(
     (e: React.MouseEvent) => {
-      // L3: Guard against synthesized mousemove on touch devices (Chrome/Android polyfill).
-      // The value card has its own touch path (IntersectionObserver shimmer) so
-      // the mouse tilt path must stay silent on pointer:coarse hardware.
-      if (window.matchMedia("(pointer: coarse)").matches) return;
+      if (isCoarsePointer.current) return;
       if (prefersReducedMotion || !cardRef.current) return;
       const rect = cardRef.current.getBoundingClientRect();
       const x = (e.clientX - rect.left) / rect.width - 0.5;
@@ -436,6 +438,11 @@ export function About() {
   const valuesTagRef = useRef<HTMLSpanElement>(null);
   const statsRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = useReducedMotion();
+  const isCoarsePointer = useRef(false);
+
+  useEffect(() => {
+    isCoarsePointer.current = window.matchMedia("(pointer: coarse)").matches;
+  }, []);
 
   /* ── rAF-throttled section mouse move ──
      Writes transform directly on manifestoRef to avoid React style
@@ -444,10 +451,7 @@ export function About() {
 
   const handleMouseMove = useCallback(
     (e: React.MouseEvent) => {
-      // L3: Guard against synthesized mousemove on touch devices.
-      // The manifesto translate(${x*12}px, ${y*8}px) parallax would wobble
-      // the hero text on Android Chrome which polyfills mousemove from touch.
-      if (window.matchMedia("(pointer: coarse)").matches) return;
+      if (isCoarsePointer.current) return;
       if (prefersReducedMotion || !sectionRef.current) return;
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
       const clientX = e.clientX;
@@ -457,7 +461,6 @@ export function About() {
         const rect = sectionRef.current.getBoundingClientRect();
         const x = ((clientX - rect.left) / rect.width) * 2 - 1;
         const y = ((clientY - rect.top) / rect.height) * 2 - 1;
-        // Direct DOM mutation — bypasses React style tracking entirely
         manifestoRef.current.style.transform =
           `translate(${x * 12}px, ${y * 8}px)`;
         rafRef.current = null;

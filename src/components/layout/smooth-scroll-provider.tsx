@@ -7,8 +7,6 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
-// Skip evaluating callbacks for triggers whose elements are far offscreen
-ScrollTrigger.config({ limitCallbacks: true });
 
 /**
  * Expose the Lenis instance via context so other components
@@ -54,9 +52,6 @@ export function SmoothScrollProvider({
       lenis.raf(time * 1000);
     };
     gsap.ticker.add(tickerCallback);
-    // Disable GSAP lag compensation — Lenis handles its own smoothing.
-    // lagSmoothing(500, 33) was adding interpolation frames that fought Lenis easing.
-    gsap.ticker.lagSmoothing(0);
 
     // Refresh ScrollTrigger positions AFTER intro completes — not during it.
     // During intro, body.overflow is "hidden" so measurements are wrong.
