@@ -107,18 +107,6 @@ function ServiceRow({
           },
         }
       );
-
-      // Mobile: activate on scroll-into-view — direct DOM, zero re-renders
-      if (isMobile) {
-        ScrollTrigger.create({
-          trigger: el,
-          start: "top 70%",
-          end: "bottom 30%",
-          onToggle: (self) => {
-            el.classList.toggle("is-active", self.isActive);
-          },
-        });
-      }
     }, el);
 
     return () => ctx.revert();

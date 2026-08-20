@@ -215,23 +215,7 @@
     opacity: 1;
   }
 
-  @media (max-width: 767px) {
-    .services-row__ghost-index {
-      font-size: clamp(4rem, 18vw, 6rem);
-      left: -0.25rem;
-    }
-  }
 
-  /* L5: At ≤479px (iPhone SE, Galaxy S8), clamp(4rem,18vw,6rem) always
-     hits the 4rem floor since 18vw=57.6px < 64px=4rem. The 64px ghost
-     number bleeds over the 3.5rem index column into the service title.
-     Reduce font and push further off-left to stay purely decorative. */
-  @media (max-width: 479px) {
-    .services-row__ghost-index {
-      font-size: clamp(2.5rem, 12vw, 3.5rem);
-      left: -1rem;
-    }
-  }
 
   /* Ã¢â€â‚¬Ã¢â€â‚¬ Index number Ã¢â‚¬â€ Geist Mono Ã¢â€â‚¬Ã¢â€â‚¬ */
 
@@ -391,7 +375,7 @@
     opacity: 1;
   }
 
-  /* Ã¢â€â‚¬Ã¢â€â‚¬ Mobile adjustments Ã¢â€â‚¬Ã¢â€â‚¬ */
+  /* —— Mobile adjustments —— */
 
   @media (max-width: 767px) {
     .services-row {
@@ -400,13 +384,38 @@
       padding: 1.75rem 0;
     }
 
+    /* Hide decorative elements that clutter small screens */
     .services-row__arrow,
-    .services-row__icon {
+    .services-row__icon,
+    .services-row__ghost-index {
+      display: none;
+    }
+
+    /* Hide description — clean index + title scan only */
+    .services-row__desc {
       display: none;
     }
 
     .services-row__title {
       font-size: clamp(1.5rem, 7vw, 2.25rem);
+    }
+
+    /* Disable ALL is-active effects on mobile — they all fire at once
+       via ScrollTrigger and flood the section with orange */
+    .services-row.is-active .services-row__sweep {
+      transform: scaleX(0);
+    }
+    .services-row.is-active .services-row__title {
+      color: var(--text-primary);
+      text-shadow: none;
+    }
+    .services-row.is-active .services-row__index {
+      color: var(--text-muted);
+      transform: none;
+      text-shadow: none;
+    }
+    .services-row.is-active .services-row__glow {
+      opacity: 0;
     }
   }
 
