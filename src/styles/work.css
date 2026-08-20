@@ -767,8 +767,38 @@
 .work-mobile-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
-  margin-top: 0.25rem;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  align-items: center;
+}
+
+/* Mobile tech chips: logo-only (no text label).
+   Desktop uses 44×44px circles with hover tooltips for names.
+   On mobile, the JSX renders text inside the same .work-tag-chip —
+   without these overrides, text overflows the 44px circle.
+   User requested: "show the logo only, not the name." */
+.work-mobile-tags .work-tag-chip {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.work-mobile-tags .work-tag-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Collapse text — icon stays visible via explicit size below */
+  font-size: 0;
+  line-height: 0;
+  color: transparent;
+}
+
+.work-mobile-tags .work-tag-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--text-muted);
 }
 
 /* Mobile closing card */

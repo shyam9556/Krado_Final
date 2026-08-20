@@ -378,7 +378,11 @@ function MobileProjectCard({ project, idx }: { project: Project; idx: number }) 
 export function Work() {
   const sectionRef = useRef<HTMLElement>(null);
   const progressFillRef = useRef<HTMLDivElement>(null);
-  const [isMobile, setIsMobile] = useState(false);
+  // Start as null (unknown) — prevents the GSAP pin from running before
+  // useLayoutEffect resolves the real value. With useState(false), the pin
+  // was created on mobile during the false→true transition, leaving an
+  // invisible ~1920px spacer that blocked all scroll below Work.
+  const [isMobile, setIsMobile] = useState<boolean | null>(null);
   const activeIndexRef = useRef(0);
   const prevActiveRef = useRef(-1);
 
@@ -394,7 +398,8 @@ export function Work() {
      DESKTOP HORIZONTAL SCROLL
      ════════════════════════════════════════════════════════════ */
   useGSAP(() => {
-    if (isMobile) return;
+    // Skip when null (not yet resolved) OR true (mobile)
+    if (isMobile !== false) return;
     const section = sectionRef.current;
     const fill = progressFillRef.current;
     if (!section) return;
