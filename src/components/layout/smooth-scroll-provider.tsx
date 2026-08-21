@@ -37,6 +37,7 @@ export function SmoothScrollProvider({
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       touchMultiplier: 2,
       infinite: false,
+      anchors: true,
     });
 
     // eslint-disable-next-line

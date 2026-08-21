@@ -22,13 +22,13 @@ const SCROLL_HIDE_THRESHOLD = 200;
 const NAV_LINKS = [
   { label: "Home", href: "#home" },
   { label: "Services", href: "#services" },
-  { label: "Our Work", href: "#work" },
   { label: "About", href: "#about" },
+  { label: "Our Work", href: "#work" },
   { label: "Testimonials", href: "#testimonials" },
   { label: "Contact", href: "#contact" },
 ] as const;
 
-const SECTION_IDS = ["home", "services", "work", "about", "testimonials", "contact"];
+const SECTION_IDS = ["home", "services", "about", "work", "testimonials", "contact"];
 
 export function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -66,7 +66,7 @@ export function Navbar() {
       });
 
       setHidden((prev) => {
-        const next = dir === 1 && scrollPos > SCROLL_HIDE_THRESHOLD;
+        const next = dir === 1 && scrollPos > SCROLL_HIDE_THRESHOLD && lenis.isScrolling !== "smooth";
         return prev === next ? prev : next;
       });
     };

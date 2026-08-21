@@ -94,7 +94,7 @@ export function Hero() {
   return (
     <section
       id="home"
-      className="relative min-h-screen overflow-hidden bg-background pt-20 md:pt-24 pb-12"
+      className="relative h-screen min-h-[600px] overflow-hidden bg-background pt-20 md:pt-24 pb-8 flex flex-col justify-center"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       ref={containerRef}
@@ -132,7 +132,7 @@ export function Hero() {
         <div ref={tiltRef} className="hero-tilt-wrapper" style={{ transformStyle: "preserve-3d" }}>
           <div className="max-w-4xl" style={{ transform: "translateZ(40px)" }}>
           
-          <motion.h1 className="h1 flex flex-col gap-2 uppercase tracking-tighter mb-8 leading-[0.9]">
+          <motion.h1 className="h1 flex flex-col gap-1 uppercase tracking-tighter mb-4 md:mb-6 leading-[0.9]">
             {/* Line 1 */}
             <div className="flex flex-wrap gap-x-4 overflow-hidden py-2">
               {headlineWords1.map((word, i) => (
@@ -175,7 +175,7 @@ export function Hero() {
 
           <motion.p 
             variants={fadeAnimation} 
-            className="body-lg max-w-xl mb-12 border-l-2 border-accent-primary pl-6 text-muted-foreground"
+            className="body-lg max-w-xl mb-6 md:mb-8 border-l-2 border-accent-primary pl-6 text-muted-foreground"
             style={{ transform: "translateZ(20px)" }}
           >
             We partner with ambitious teams to design, develop, and ship
