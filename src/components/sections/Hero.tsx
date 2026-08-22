@@ -135,7 +135,7 @@ export function Hero() {
           
           <motion.h1 className="h1 flex flex-col gap-1 uppercase tracking-tighter mb-4 md:mb-6 leading-[0.9]">
             {/* Line 1 — BUILDING */}
-            <div className="flex gap-x-4 overflow-hidden py-2">
+            <div className="flex gap-x-4 overflow-hidden">
               {headlineLine1.map((word, i) => (
                 <motion.span 
                   key={i} 
@@ -149,7 +149,7 @@ export function Hero() {
             </div>
 
             {/* Line 2 — SOFTWARE THAT */}
-            <div className="flex gap-x-4 overflow-hidden py-2">
+            <div className="flex gap-x-4 overflow-hidden">
               {headlineLine2.map((word, i) => (
                 <motion.span 
                   key={i} 
