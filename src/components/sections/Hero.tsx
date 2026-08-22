@@ -94,7 +94,7 @@ export function Hero() {
   return (
     <section
       id="home"
-      className="relative h-screen min-h-[600px] overflow-hidden bg-background pt-20 md:pt-24 pb-8 flex flex-col justify-center"
+      className="relative min-h-screen overflow-hidden bg-background pt-20 md:pt-24 pb-8"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       ref={containerRef}
