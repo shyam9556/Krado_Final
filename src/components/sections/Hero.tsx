@@ -71,7 +71,8 @@ export function Hero() {
   const shouldAnimate = prefersReducedMotion ? "visible" : introComplete ? "visible" : "hidden";
 
   // Split headline for clip-path animation
-  const headlineWords1 = ["Building", "software", "that"];
+  const headlineLine1 = ["Building"];
+  const headlineLine2 = ["software", "that"];
   const headlineWords2 = ["your", "business", "forward"];
 
   const wordAnimation: Variants = {
@@ -133,14 +134,28 @@ export function Hero() {
           <div className="max-w-4xl" style={{ transform: "translateZ(40px)" }}>
           
           <motion.h1 className="h1 flex flex-col gap-1 uppercase tracking-tighter mb-4 md:mb-6 leading-[0.9]">
-            {/* Line 1 */}
-            <div className="flex flex-wrap gap-x-4 overflow-hidden py-2">
-              {headlineWords1.map((word, i) => (
+            {/* Line 1 — BUILDING */}
+            <div className="flex gap-x-4 overflow-hidden py-2">
+              {headlineLine1.map((word, i) => (
                 <motion.span 
                   key={i} 
                   className="inline-block" 
                   variants={wordAnimation}
                   transition={{ delay: i * 0.05 }}
+                >
+                  {word}
+                </motion.span>
+              ))}
+            </div>
+
+            {/* Line 2 — SOFTWARE THAT */}
+            <div className="flex gap-x-4 overflow-hidden py-2">
+              {headlineLine2.map((word, i) => (
+                <motion.span 
+                  key={i} 
+                  className="inline-block" 
+                  variants={wordAnimation}
+                  transition={{ delay: 0.05 + i * 0.05 }}
                 >
                   {word}
                 </motion.span>
