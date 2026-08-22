@@ -174,7 +174,7 @@ export function Hero() {
             </div>
 
             {/* Line 3 */}
-            <div className="flex flex-wrap gap-x-4 overflow-hidden py-2">
+            <div className="flex flex-wrap gap-x-4 overflow-hidden">
               {headlineWords2.map((word, i) => (
                 <motion.span 
                   key={i} 
