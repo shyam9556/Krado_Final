@@ -163,7 +163,7 @@ export function Hero() {
             </div>
             
             {/* Accent Line */}
-            <div className="overflow-hidden py-2 -my-2">
+            <div className="overflow-hidden">
               <motion.span 
                 className="inline-block text-accent-primary dark:drop-shadow-[0_0_15px_rgba(255,85,0,0.3)]" 
                 variants={wordAnimation}
