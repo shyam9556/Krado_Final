@@ -53,14 +53,14 @@
     }
   }
 
-  /* ----- Logo (Geist Mono Ã¢â‚¬â€ matches DecodeIntro) ----- */
+  /* ----- Logo (Space Grotesk — matches Footer) ----- */
 
   .navbar-logo {
-    font-family: var(--font-geist-mono), monospace;
+    font-family: var(--font-space-grotesk), sans-serif;
     font-weight: 700;
-    font-size: 1.25rem;
-    letter-spacing: 0.08em;
-    color: var(--text-primary);
+    font-size: 1.5rem;
+    letter-spacing: 0.1em;
+    color: var(--foreground);
     text-decoration: none;
     flex-shrink: 0;
     transition: opacity 180ms ease;

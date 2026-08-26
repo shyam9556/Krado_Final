@@ -91,7 +91,7 @@ function FloatingTechIcons({ tags }: { tags: string[] }) {
     <div className="work-floating-icons" aria-hidden="true">
       {tags.slice(0, 3).map((tag, i) => {
         const mapped = TECH_ICONS[tag] ?? tag.toLowerCase().replace(/[^a-z0-9]/g, "");
-        const maskUrl = `/icons/${mapped}.svg`;
+        const maskUrl = `/tech-icons/${mapped}.svg`;
         const slot = FLOAT_SLOTS[i];
         return (
           <div
@@ -276,12 +276,14 @@ function MobileProjectCard({ project, idx }: { project: Project; idx: number }) 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { gsap.set(el, { opacity: 1 }); return; }
     gsap.fromTo(el, { opacity: 0, y: 60 }, {
       opacity: 1, y: 0, duration: 0.85, ease: "power3.out",
-      scrollTrigger: { trigger: el, start: "top 88%", toggleActions: "play none none none" },
+      immediateRender: false,
+      scrollTrigger: { trigger: el, start: "top 88%", toggleActions: "play none none none", invalidateOnRefresh: true },
     });
     const tags = el.querySelectorAll(".work-tag-chip");
     if (tags.length) gsap.fromTo(tags, { opacity: 0, x: -8 }, {
       opacity: 1, x: 0, stagger: 0.07, duration: 0.4, ease: "power2.out",
-      scrollTrigger: { trigger: el, start: "top 82%", toggleActions: "play none none none" },
+      immediateRender: false,
+      scrollTrigger: { trigger: el, start: "top 82%", toggleActions: "play none none none", invalidateOnRefresh: true },
     });
   }, { scope: ref });
 
@@ -353,7 +355,7 @@ function MobileProjectCard({ project, idx }: { project: Project; idx: number }) 
         <div className="work-mobile-tags" role="list">
           {project.tags.map(tag => {
             const mapped = TECH_ICONS[tag] ?? tag.toLowerCase().replace(/[^a-z0-9]/g, "");
-            const maskUrl = `/icons/${mapped}.svg`;
+            const maskUrl = `/tech-icons/${mapped}.svg`;
             return (
               <span key={tag} className="work-tag-chip" role="listitem" title={tag}>
                 <span className="work-tag-inner">
@@ -781,7 +783,7 @@ function DesktopPanel({ project, isActive }: { project: Project; isActive: boole
         <div className="work-panel-tags" role="list">
           {project.tags.map((tag, i) => {
             const mapped = TECH_ICONS[tag] ?? tag.toLowerCase().replace(/[^a-z0-9]/g, "");
-            const maskUrl = `/icons/${mapped}.svg`;
+            const maskUrl = `/tech-icons/${mapped}.svg`;
             return (
               <span
                 key={tag}
@@ -853,7 +855,8 @@ function MobileClosingCard() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { gsap.set(el, { opacity: 1 }); return; }
     gsap.fromTo(el, { opacity: 0, y: 60 }, {
       opacity: 1, y: 0, duration: 0.85, ease: "power3.out",
-      scrollTrigger: { trigger: el, start: "top 88%", toggleActions: "play none none none" },
+      immediateRender: false,
+      scrollTrigger: { trigger: el, start: "top 88%", toggleActions: "play none none none", invalidateOnRefresh: true },
     });
   }, { scope: ref });
   return (

@@ -2,7 +2,7 @@
 
 import "@/styles/contact.css";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, ArrowRight } from "lucide-react";
 import { Magnetic } from "@/components/ui/Magnetic";
@@ -35,6 +35,10 @@ export function Contact() {
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  // Honeypot field — invisible to humans, bots fill it automatically
+  const [honeypot, setHoneypot] = useState("");
 
 
 
@@ -46,25 +50,54 @@ export function Contact() {
     );
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !email || !message) return;
 
     setIsSubmitting(true);
-    // Simulate API request
-    setTimeout(() => {
+    setErrorMessage("");
+
+    try {
+      const response = await fetch("/contact.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          email,
+          company,
+          message,
+          services: selectedServices.join(", "),
+          timeline: selectedTimeline,
+          website: honeypot, // Honeypot — should be empty for real users
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setIsSuccess(true);
+        // Reset form fields
+        setName("");
+        setEmail("");
+        setCompany("");
+        setMessage("");
+        setSelectedServices([]);
+        setSelectedTimeline("");
+        setHoneypot("");
+        // Clear success message after 5 seconds
+        setTimeout(() => setIsSuccess(false), 5000);
+      } else {
+        setErrorMessage(
+          data.message || "Something went wrong. Please try again."
+        );
+      }
+    } catch {
+      setErrorMessage(
+        "Could not connect to the server. Please email us directly at hello@krado.co"
+      );
+    } finally {
       setIsSubmitting(false);
-      setIsSuccess(true);
-      // Reset form fields
-      setName("");
-      setEmail("");
-      setCompany("");
-      setMessage("");
-      setSelectedServices([]);
-      setSelectedTimeline("");
-      // Clear success message after 5 seconds
-      setTimeout(() => setIsSuccess(false), 5000);
-    }, 2000);
+    }
   };
 
   return (
@@ -238,6 +271,20 @@ export function Contact() {
                 </div>
               </div>
 
+              {/* Honeypot field — hidden from humans, traps bots */}
+              <div aria-hidden="true" style={{ position: 'absolute', left: '-9999px', opacity: 0, height: 0, overflow: 'hidden' }}>
+                <label htmlFor="form-website">Website</label>
+                <input
+                  id="form-website"
+                  type="text"
+                  name="website"
+                  value={honeypot}
+                  onChange={(e) => setHoneypot(e.target.value)}
+                  tabIndex={-1}
+                  autoComplete="off"
+                />
+              </div>
+
               {/* Submit panel */}
               <div className="form-submit-row mt-10">
                 <Magnetic strength={0.15}>
@@ -282,6 +329,25 @@ export function Contact() {
                     <span className="text-sm text-green-600 dark:text-green-400 font-mono">
                       Thank you! We have received your project details and will follow up in 24 hours.
                     </span>
+                  </motion.div>
+                )}
+                {errorMessage && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    className="flex items-start gap-3 p-4 mt-4 rounded-lg border border-red-500/20 bg-red-500/5"
+                  >
+                    <span className="text-sm text-red-500 dark:text-red-400 font-mono flex-1">
+                      {errorMessage}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setErrorMessage("")}
+                      className="text-red-500/60 hover:text-red-500 transition-colors text-xs font-mono"
+                    >
+                      ✕
+                    </button>
                   </motion.div>
                 )}
               </AnimatePresence>

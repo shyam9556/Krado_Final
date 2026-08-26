@@ -62,10 +62,10 @@ interface StatItem {
 }
 
 const STATS: StatItem[] = [
-  { value: 50, suffix: "+", label: "Projects Shipped" },
-  { value: 8, suffix: "+", label: "Years of Craft" },
-  { value: 30, suffix: "+", label: "Technologies Mastered" },
-  { value: 99, suffix: "%", label: "Client Retention" },
+  { value: 15, suffix: "+", label: "Projects Delivered" },
+  { value: 3, suffix: "+", label: "Years of Craft" },
+  { value: 15, suffix: "+", label: "Technologies Mastered" },
+  { value: 98, suffix: "%", label: "Client Retention" },
 ];
 
 const TICKER_ITEMS = [
@@ -337,6 +337,7 @@ function AnimatedStat({
       trigger: el,
       start: "top 92%",
       once: true,
+      invalidateOnRefresh: true,
       onEnter: () => {
         hasAnimatedRef.current = true;
 
@@ -500,11 +501,13 @@ export function About() {
         opacity: 1,
         duration: 1,
         ease: "power3.out",
+        immediateRender: false,
         scrollTrigger: {
           trigger: section,
           start: "top 80%",
           toggleActions: "play none none none",
           once: true,
+          invalidateOnRefresh: true,
         },
       }
     );
@@ -523,11 +526,13 @@ export function About() {
           duration: 1,
           stagger: 0.12,
           ease: "power3.out",
+          immediateRender: false,
           scrollTrigger: {
             trigger: manifesto,
             start: "top 82%",
             toggleActions: "play none none none",
             once: true,
+            invalidateOnRefresh: true,
           },
         }
       );
@@ -545,11 +550,13 @@ export function About() {
           duration: 1,
           delay: 0.4,
           ease: "power3.out",
+          immediateRender: false,
           scrollTrigger: {
             trigger: body,
             start: "top 85%",
             toggleActions: "play none none none",
             once: true,
+            invalidateOnRefresh: true,
           },
         }
       );
@@ -566,11 +573,13 @@ export function About() {
           opacity: 1,
           duration: 0.8,
           ease: "power3.out",
+          immediateRender: false,
           scrollTrigger: {
             trigger: valuesTag,
             start: "top 88%",
             toggleActions: "play none none none",
             once: true,
+            invalidateOnRefresh: true,
           },
         }
       );
@@ -590,11 +599,13 @@ export function About() {
           duration: 0.9,
           stagger: 0.12,
           ease: "power3.out",
+          immediateRender: false,
           scrollTrigger: {
             trigger: values,
             start: "top 85%",
             toggleActions: "play none none none",
             once: true,
+            invalidateOnRefresh: true,
           },
         }
       );
@@ -613,11 +624,13 @@ export function About() {
           duration: 0.8,
           stagger: 0.1,
           ease: "power3.out",
+          immediateRender: false,
           scrollTrigger: {
             trigger: stats,
             start: "top 88%",
             toggleActions: "play none none none",
             once: true,
+            invalidateOnRefresh: true,
           },
         }
       );
@@ -634,11 +647,13 @@ export function About() {
           scaleX: 1,
           duration: 1.5,
           ease: "power2.out",
+          immediateRender: false,
           scrollTrigger: {
             trigger: rule,
             start: "top 88%",
             toggleActions: "play none none none",
             once: true,
+            invalidateOnRefresh: true,
           },
         }
       );

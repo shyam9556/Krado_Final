@@ -2,24 +2,12 @@
 
 import "@/styles/footer.css";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUp, Send, Check } from "lucide-react";
+import { ArrowUp } from "lucide-react";
 import { Magnetic } from "@/components/ui/Magnetic";
 import { useLenis } from "@/components/layout/smooth-scroll-provider";
 
 export function Footer() {
-  const [email, setEmail] = useState("");
-  const [subscribed, setSubscribed] = useState(false);
   const lenis = useLenis();
-
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-    setSubscribed(true);
-    setEmail("");
-    setTimeout(() => setSubscribed(false), 5000);
-  };
 
   const scrollToTop = () => {
     if (lenis) {
@@ -34,7 +22,7 @@ export function Footer() {
       {/* Background glow structures */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         <div className="scanline-grid opacity-[0.02] absolute inset-0" />
-        <div 
+        <div
           className="absolute right-[-10rem] bottom-[-10rem] h-[500px] w-[500px] rounded-full"
           style={{
             background: "radial-gradient(circle, rgba(255,85,0,0.04) 0%, transparent 88%)",
@@ -44,98 +32,52 @@ export function Footer() {
 
       <div className="footer-container">
         <div className="footer-grid">
-          
-          {/* Logo & Newsletter */}
+
+          {/* Brand */}
           <div className="footer-brand-zone">
-            <div className="footer-logo-title">
-              KRADO<span>.</span>
+            <div className="footer-logo-title group relative flex items-center gap-3 w-fit cursor-default">
+              <span className="w-1 h-5 bg-accent-primary transform scale-y-50 origin-bottom transition-transform duration-300 group-hover:scale-y-100" />
+              KRADO
             </div>
             <p className="footer-brand-desc">
               We design and engineer digital platforms that scale with your ambitions. No templates, no compromise.
             </p>
-            <div className="footer-newsletter-wrap">
-              <span className="footer-newsletter-label">Subscribe to our newsletter</span>
-              <form onSubmit={handleSubscribe} className="footer-newsletter-form">
-                <input
-                  type="email"
-                  placeholder="Enter your email address"
-                  className="footer-newsletter-input"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={subscribed}
-                  required
-                />
-                <button
-                  type="submit"
-                  className={`footer-subscribe-btn flex items-center justify-center min-w-[50px] ${subscribed ? "!bg-green-500 !text-white" : ""}`}
-                  aria-label="Subscribe"
-                >
-                  {subscribed ? <Check className="w-4 h-4" /> : <Send className="w-4 h-4" />}
-                </button>
-              </form>
-              <AnimatePresence>
-                {subscribed && (
-                  <motion.span
-                    initial={{ opacity: 0, y: 4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                    className="text-xs text-green-500 font-mono mt-1"
-                  >
-                    Successfully subscribed!
-                  </motion.span>
-                )}
-              </AnimatePresence>
-            </div>
           </div>
 
-          {/* Links Column 1: Services */}
+          {/* Services — names match Services.tsx exactly, links go to specific service row */}
           <div className="footer-links-col">
             <span className="footer-col-title">Services</span>
             <ul className="footer-links-list">
-              <li className="footer-link-item"><a href="#services">Custom Engineering</a></li>
-              <li className="footer-link-item"><a href="#services">UI/UX Interface Design</a></li>
-              <li className="footer-link-item"><a href="#services">Cloud Architecture</a></li>
-              <li className="footer-link-item"><a href="#services">AI Embeddings Integration</a></li>
+              <li className="footer-link-item"><a href="#service-web-development">Web Development</a></li>
+              <li className="footer-link-item"><a href="#service-mobile-apps">Mobile Apps</a></li>
+              <li className="footer-link-item"><a href="#service-cloud-devops">Cloud & DevOps</a></li>
+              <li className="footer-link-item"><a href="#service-ui-ux-design">UI/UX Design</a></li>
+              <li className="footer-link-item"><a href="#service-ai-automation">AI & Automation</a></li>
             </ul>
           </div>
 
-          {/* Links Column 2: Company */}
+          {/* Company */}
           <div className="footer-links-col">
             <span className="footer-col-title">Company</span>
             <ul className="footer-links-list">
               <li className="footer-link-item"><a href="#work">Selected Work</a></li>
-              <li className="footer-link-item"><a href="#about">About & Manifesto</a></li>
-              <li className="footer-link-item"><a href="#about">Philosophy</a></li>
-              <li className="footer-link-item"><a href="#contact">Careers</a></li>
+              <li className="footer-link-item"><a href="#about">About Krado</a></li>
+              <li className="footer-link-item"><a href="#testimonials">Client Stories</a></li>
+              <li className="footer-link-item"><a href="#contact">Get in Touch</a></li>
             </ul>
           </div>
 
-          {/* Links Column 3: Resources */}
+          {/* Connect */}
           <div className="footer-links-col">
-            <span className="footer-col-title">Resources</span>
+            <span className="footer-col-title">Connect</span>
             <ul className="footer-links-list">
-              <li className="footer-link-item"><a href="#testimonials">Client Success Stories</a></li>
-              <li className="footer-link-item"><a href="#contact">Developer Docs</a></li>
-              <li className="footer-link-item"><a href="#contact">System Status</a></li>
+              <li className="footer-link-item"><a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
+              <li className="footer-link-item"><a href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+              <li className="footer-link-item"><a href="https://twitter.com" target="_blank" rel="noopener noreferrer">Twitter / X</a></li>
               <li className="footer-link-item"><a href="#contact">Contact Support</a></li>
             </ul>
           </div>
 
-        </div>
-
-        {/* Footer Brand Logo (matches Navbar style) */}
-        <div className="flex justify-center w-full mt-24 mb-12">
-          <button
-            type="button"
-            className="group relative flex items-center gap-3 md:gap-5 cursor-pointer bg-transparent border-none"
-            onClick={scrollToTop}
-            aria-label="Scroll back to top"
-          >
-            <span className="w-1.5 md:w-2.5 h-8 md:h-16 bg-accent-primary transform scale-y-50 origin-bottom transition-transform duration-300 group-hover:scale-y-100" />
-            <span className="text-4xl md:text-7xl font-bold tracking-[0.2em] text-foreground font-mono transition-colors duration-300 group-hover:text-accent-primary">
-              KRADO
-            </span>
-          </button>
         </div>
 
         {/* Footer Bottom bar */}
@@ -158,7 +100,7 @@ export function Footer() {
                 </svg>
               </a>
             </Magnetic>
-            
+
             <Magnetic strength={0.35}>
               <a
                 href="https://linkedin.com"

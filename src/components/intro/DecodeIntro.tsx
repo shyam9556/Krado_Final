@@ -17,8 +17,18 @@ export function DecodeIntro() {
   const containerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     try {
-      sessionStorage.removeItem(INTRO_SESSION_KEY);
-    } catch {}
+      if (sessionStorage.getItem(INTRO_SESSION_KEY)) {
+        // User already saw intro this session — skip it
+        setShouldShow(false);
+        window.dispatchEvent(new Event("krado:intro-complete"));
+        return;
+      }
+    } catch {
+      // sessionStorage unavailable — skip intro gracefully
+      setShouldShow(false);
+      window.dispatchEvent(new Event("krado:intro-complete"));
+      return;
+    }
     setShouldShow(true);
   }, []);
 

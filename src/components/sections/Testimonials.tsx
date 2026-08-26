@@ -259,11 +259,13 @@ export function Testimonials() {
       trigger: section,
       toggleActions: "play none none none" as const,
       once: true,
+      invalidateOnRefresh: true,
     };
 
     const t1 = gsap.fromTo(tag,
       { opacity: 0, y: 24 },
       { opacity: 1, y: 0, duration: 0.8, ease: "power3.out",
+        immediateRender: false,
         scrollTrigger: { ...base, start: "top 85%" } }
     );
     if (t1.scrollTrigger) triggers.push(t1.scrollTrigger);
@@ -271,6 +273,7 @@ export function Testimonials() {
     const t2 = gsap.fromTo(content,
       { opacity: 0, y: 32 },
       { opacity: 1, y: 0, duration: 1, ease: "power3.out",
+        immediateRender: false,
         scrollTrigger: { ...base, start: "top 80%" } }
     );
     if (t2.scrollTrigger) triggers.push(t2.scrollTrigger);
@@ -278,6 +281,7 @@ export function Testimonials() {
     const t3 = gsap.fromTo(bottom,
       { opacity: 0, y: 20 },
       { opacity: 1, y: 0, duration: 0.8, ease: "power3.out",
+        immediateRender: false,
         scrollTrigger: { ...base, start: "top 75%" } }
     );
     if (t3.scrollTrigger) triggers.push(t3.scrollTrigger);

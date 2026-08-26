@@ -41,6 +41,23 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col font-sans overflow-x-hidden">
+        {/* Blocking inline script — runs BEFORE React hydration.
+            Must execute before any GSAP ScrollTrigger measures positions.
+            useEffect/useLayoutEffect in components is too late — browser
+            has already restored scroll position by then. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if(history.scrollRestoration)history.scrollRestoration='manual';
+              window.scrollTo(0,0);
+              if(location.hash){
+                window.__kradoDeepLink=location.hash;
+                history.replaceState(null,'',location.pathname+location.search);
+              }
+              requestAnimationFrame(function(){window.scrollTo(0,0)});
+            `,
+          }}
+        />
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"

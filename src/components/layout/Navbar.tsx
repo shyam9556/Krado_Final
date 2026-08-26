@@ -158,10 +158,10 @@ export function Navbar() {
           <Magnetic strength={0.15}>
             <a
               href="#home"
-              className="group relative flex items-center gap-3 text-lg font-bold tracking-widest text-foreground font-mono"
+              className="navbar-logo group relative flex items-center gap-3"
               aria-label="Krado — Back to top"
             >
-              <span className="w-1 h-4 bg-accent-primary transform scale-y-50 origin-bottom transition-transform duration-300 group-hover:scale-y-100" />
+              <span className="w-1 h-5 bg-accent-primary transform scale-y-50 origin-bottom transition-transform duration-300 group-hover:scale-y-100" />
               KRADO
             </a>
           </Magnetic>

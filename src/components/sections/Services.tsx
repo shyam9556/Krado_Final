@@ -14,6 +14,7 @@ import { MonitorSmartphone, Smartphone, CloudCog, PenTool, Bot, type LucideIcon 
 /* ─── Service data ─── */
 interface ServiceItem {
   index: string;
+  slug: string;
   title: string;
   description: string;
   icon: LucideIcon;
@@ -22,6 +23,7 @@ interface ServiceItem {
 const SERVICES: ServiceItem[] = [
   {
     index: "01",
+    slug: "web-development",
     title: "Web Development",
     description:
       "High-performance web applications built with modern stacks — from marketing sites to complex SaaS platforms.",
@@ -29,6 +31,7 @@ const SERVICES: ServiceItem[] = [
   },
   {
     index: "02",
+    slug: "mobile-apps",
     title: "Mobile Apps",
     description:
       "Native and cross-platform mobile experiences that ship fast, scale smoothly, and feel premium on every device.",
@@ -36,6 +39,7 @@ const SERVICES: ServiceItem[] = [
   },
   {
     index: "03",
+    slug: "cloud-devops",
     title: "Cloud & DevOps",
     description:
       "Infrastructure as code, CI/CD pipelines, and cloud architecture designed for zero-downtime scale.",
@@ -43,6 +47,7 @@ const SERVICES: ServiceItem[] = [
   },
   {
     index: "04",
+    slug: "ui-ux-design",
     title: "UI/UX Design",
     description:
       "Research-driven interface design that turns complexity into clarity — wireframes to high-fidelity prototypes.",
@@ -50,12 +55,14 @@ const SERVICES: ServiceItem[] = [
   },
   {
     index: "05",
+    slug: "ai-automation",
     title: "AI & Automation",
     description:
       "Intelligent systems that automate workflows, surface insights, and augment human decision-making.",
     icon: Bot,
   },
 ];
+
 
 
 function ServiceRow({
@@ -69,11 +76,9 @@ function ServiceRow({
 }) {
   const rowRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = useReducedMotion();
-  // No isActive state — class toggled directly on DOM to avoid re-renders
-  // during scroll (ScrollTrigger.onToggle) and mouse events (enter/leave).
   const [isMobile, setIsMobile] = useState(false);
 
-  /* Responsive detection — runs client-side only to avoid SSR hydration mismatch */
+  /* Responsive detection */
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 1023px)");
     setIsMobile(mq.matches);
@@ -82,13 +87,39 @@ function ServiceRow({
     return () => mq.removeEventListener("change", handler);
   }, []);
 
-  /* GSAP ScrollTrigger — works properly with Lenis */
+  /* Hash-based auto-highlight — when a footer link like #service-web-development
+     is clicked, Lenis scrolls here and we briefly pulse the active state so the
+     user clearly sees which service was targeted. */
+  useEffect(() => {
+    const el = rowRef.current;
+    if (!el) return;
+
+    const highlight = () => {
+      if (window.location.hash === `#service-${service.slug}`) {
+        el.classList.add("is-active");
+        // Remove after 2.5s — long enough to be noticed, short enough to not linger
+        const timer = setTimeout(() => el.classList.remove("is-active"), 2500);
+        return () => clearTimeout(timer);
+      }
+    };
+
+    // Check on mount (page load with hash already in URL)
+    const cleanup = highlight();
+
+    // Check whenever hash changes (user clicks footer link while already on page)
+    window.addEventListener("hashchange", highlight);
+    return () => {
+      window.removeEventListener("hashchange", highlight);
+      cleanup?.();
+    };
+  }, [service.slug]);
+
+  /* GSAP ScrollTrigger entrance */
   useEffect(() => {
     const el = rowRef.current;
     if (!el) return;
 
     const ctx = gsap.context(() => {
-      // Entrance animation
       gsap.fromTo(
         el,
         { opacity: 0, y: 50, rotateX: prefersReducedMotion ? 0 : 3 },
@@ -98,12 +129,14 @@ function ServiceRow({
           rotateX: 0,
           duration: prefersReducedMotion ? 0 : 1,
           ease: "power3.out",
+          immediateRender: false,
           scrollTrigger: {
             trigger: el,
             start: "top 90%",
             end: "top 60%",
             toggleActions: "play none none none",
             once: true,
+            invalidateOnRefresh: true,
           },
         }
       );
@@ -112,7 +145,7 @@ function ServiceRow({
     return () => ctx.revert();
   }, [isMobile, prefersReducedMotion]);
 
-  /* Desktop: hover state with 3D tilt — direct DOM, zero re-renders */
+  /* Desktop: hover 3D tilt — direct DOM, zero re-renders */
   const handleMouseEnter = useCallback(() => {
     if (!isMobile && rowRef.current)
       rowRef.current.classList.add("is-active");
@@ -121,7 +154,6 @@ function ServiceRow({
   const handleMouseLeave = useCallback(() => {
     if (!isMobile && rowRef.current) {
       rowRef.current.classList.remove("is-active");
-      // Reset tilt directly on DOM — CSS transition handles the smooth ease-out
       rowRef.current.style.transform = "";
     }
   }, [isMobile]);
@@ -132,7 +164,6 @@ function ServiceRow({
       const rect = rowRef.current.getBoundingClientRect();
       const x = (e.clientX - rect.left) / rect.width - 0.5;
       const y = (e.clientY - rect.top) / rect.height - 0.5;
-      // Direct DOM mutation — zero React re-renders, same values as before
       rowRef.current.style.transform =
         `perspective(800px) rotateX(${y * -2}deg) rotateY(${x * 3}deg)`;
     },
@@ -142,18 +173,17 @@ function ServiceRow({
   return (
     <div
       ref={rowRef}
+      id={`service-${service.slug}`}
       className="services-row"
       data-last={isLast ? "true" : undefined}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onMouseMove={handleMouseMove}
-      // No inline style — transform written by handleMouseMove directly,
-      // transition is in services.css (.services-row at 1024px breakpoint)
     >
       {/* Accent sweep line */}
       <span className="services-row__sweep" aria-hidden="true" />
 
-      {/* Oversized stroke index number — layered behind */}
+      {/* Oversized stroke index number */}
       <span className="services-row__ghost-index" aria-hidden="true">
         {service.index}
       </span>
@@ -209,12 +239,14 @@ export function Services() {
         opacity: 1,
         duration: 1.2,
         ease: "power3.out",
+        immediateRender: false,
         scrollTrigger: {
           trigger: section,
           start: "top 80%",
           end: "top 40%",
           toggleActions: "play none none none",
           once: true,
+          invalidateOnRefresh: true,
         },
       }
     );
@@ -230,11 +262,13 @@ export function Services() {
           scaleX: 1,
           duration: 1.5,
           ease: "power2.out",
+          immediateRender: false,
           scrollTrigger: {
             trigger: rule,
             start: "top 85%",
             toggleActions: "play none none none",
             once: true,
+            invalidateOnRefresh: true,
           },
         }
       );

@@ -60,12 +60,13 @@
 }
 
 .footer-logo-title {
-  font-family: var(--font-heading);
+  font-family: var(--font-space-grotesk), sans-serif;
   font-size: 1.5rem;
   font-weight: 700;
-  letter-spacing: 0.05em;
-  color: var(--text-primary);
+  letter-spacing: 0.1em;
+  color: var(--foreground);
 }
+
 
 .footer-logo-title span {
   color: var(--accent-primary);
