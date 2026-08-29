@@ -75,10 +75,14 @@ export function Hero() {
   const headlineLine2 = ["software", "that"];
   const headlineWords2 = ["your", "business", "forward"];
 
+  /* Each word starts invisible (opacity:0) AND below its container (y:110%).
+     opacity:0 is the key — it guarantees no word can flash before its
+     animation starts, regardless of overflow clipping or scroll position. */
   const wordAnimation: Variants = {
-    hidden: { y: "110%" },
+    hidden: { y: "110%", opacity: 0 },
     visible: { 
       y: "0%", 
+      opacity: 1,
       transition: { duration: 0.8, ease: [0.76, 0, 0.24, 1] } 
     }
   };
@@ -95,7 +99,7 @@ export function Hero() {
   return (
     <section
       id="home"
-      className="relative min-h-screen overflow-hidden bg-background pt-20 md:pt-24 pb-8"
+      className="relative md:min-h-screen overflow-hidden bg-background pt-20 md:pt-24 pb-8"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       ref={containerRef}
@@ -128,6 +132,7 @@ export function Hero() {
         initial={prefersReducedMotion ? "visible" : "hidden"}
         animate={shouldAnimate}
       >
+
         {/* Inner wrapper for direct DOM tilt — separated from
             motion.div so entrance animation and tilt don't conflict */}
         <div ref={tiltRef} className="hero-tilt-wrapper" style={{ transformStyle: "preserve-3d" }}>
@@ -188,6 +193,8 @@ export function Hero() {
             </div>
           </motion.h1>
 
+
+
           <motion.p 
             variants={fadeAnimation} 
             className="body-lg max-w-xl mb-6 md:mb-8 border-l-2 border-accent-primary pl-6 text-muted-foreground"
@@ -236,7 +243,7 @@ export function Hero() {
 
       {/* ── Scroll indicator ── */}
       <div
-        className="absolute bottom-8 left-6 md:left-12 flex flex-col items-center gap-2 transition-opacity duration-300"
+        className="hidden md:flex absolute bottom-8 left-6 md:left-12 flex-col items-center gap-2 transition-opacity duration-300"
         style={{ opacity: scrollIndicatorOpacity }}
         aria-hidden="true"
       >

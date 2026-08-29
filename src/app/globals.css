@@ -261,6 +261,13 @@
     color: var(--text-primary);
   }
 
+  /* Mobile override — clamp floor of 3.5rem is too large on narrow screens */
+  @media (max-width: 639px) {
+    .h1 {
+      font-size: clamp(2.25rem, 10vw, 3rem);
+    }
+  }
+
   .h2 {
     font-family: var(--font-heading);
     font-size: clamp(2rem, 3.5vw, 3rem);

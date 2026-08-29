@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useLayoutEffect, useState } from "react";
 
 const INTRO_SESSION_KEY = "krado-intro-seen";
 
@@ -32,23 +32,27 @@ export function IntroStateProvider({
 }) {
   const [introComplete, setIntroComplete] = useState(false);
 
-  useEffect(() => {
-    // One-time check for returning visitors (session key already set)
+  /* ── Returning visitors: check BEFORE paint ──
+     useLayoutEffect fires synchronously after DOM mutation but BEFORE
+     the browser paints. This ensures introComplete=true is set before
+     the first visual frame — no flash of hidden hero content. */
+  useLayoutEffect(() => {
     try {
       if (sessionStorage.getItem(INTRO_SESSION_KEY)) {
         setIntroComplete(true);
-        return;
       }
     } catch {
       setIntroComplete(true);
-      return;
     }
+  }, []);
 
-    // Listen for DecodeIntro's completion event — replaces 100ms polling
+  /* ── First-time visitors: listen for intro completion event ── */
+  useEffect(() => {
+    if (introComplete) return; // Already done (returning visitor)
     const handler = () => setIntroComplete(true);
     window.addEventListener("krado:intro-complete", handler);
     return () => window.removeEventListener("krado:intro-complete", handler);
-  }, []);
+  }, [introComplete]);
 
   return (
     <IntroStateContext.Provider value={{ introComplete }}>

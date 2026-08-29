@@ -129,7 +129,7 @@ export function DecodeIntro() {
           className="fixed inset-0 z-[9999] flex flex-col items-center justify-center intro-container overflow-hidden bg-background"
           initial={{ opacity: 1 }}
           exit={{ 
-            clipPath: "inset(100% 0% 0% 0%)", 
+            clipPath: "inset(0% 0% 100% 0%)", 
             transition: { duration: 0.8, ease: [0.76, 0, 0.24, 1] } 
           }}
           role="status"

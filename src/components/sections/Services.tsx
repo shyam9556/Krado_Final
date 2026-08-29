@@ -119,6 +119,8 @@ function ServiceRow({
     const el = rowRef.current;
     if (!el) return;
 
+    gsap.registerPlugin(ScrollTrigger);
+
     const ctx = gsap.context(() => {
       gsap.fromTo(
         el,
@@ -132,7 +134,7 @@ function ServiceRow({
           immediateRender: false,
           scrollTrigger: {
             trigger: el,
-            start: "top 90%",
+            start: "top 95%",
             end: "top 60%",
             toggleActions: "play none none none",
             once: true,
@@ -141,6 +143,10 @@ function ServiceRow({
         }
       );
     }, el);
+
+    /* Refresh after a frame so elements already in the viewport
+       on page load get their ScrollTrigger fired immediately */
+    requestAnimationFrame(() => ScrollTrigger.refresh());
 
     return () => ctx.revert();
   }, [isMobile, prefersReducedMotion]);

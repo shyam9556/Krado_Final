@@ -68,7 +68,7 @@ export function Footer() {
           </div>
 
           {/* Connect */}
-          <div className="footer-links-col">
+          <div className="footer-links-col footer-connect-col">
             <span className="footer-col-title">Connect</span>
             <ul className="footer-links-list">
               <li className="footer-link-item"><a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
