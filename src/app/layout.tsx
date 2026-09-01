@@ -24,9 +24,67 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Krado — IT Solutions That Scale",
+  metadataBase: new URL("https://kradotech.com"),
+  title: {
+    default: "Krado — IT Solutions That Scale",
+    template: "%s | Krado",
+  },
   description:
     "Krado is a software development and IT services company delivering scalable, high-quality digital solutions for businesses worldwide.",
+  keywords: [
+    "software development",
+    "IT services",
+    "web development",
+    "mobile app development",
+    "digital solutions",
+    "Krado",
+    "scalable software",
+  ],
+  authors: [{ name: "Krado", url: "https://kradotech.com" }],
+  creator: "Krado",
+  publisher: "Krado",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  icons: {
+    icon: [
+      { url: "/krado-favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/krado-favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://kradotech.com",
+    siteName: "Krado",
+    title: "Krado — IT Solutions That Scale",
+    description:
+      "Krado is a software development and IT services company delivering scalable, high-quality digital solutions for businesses worldwide.",
+    images: [
+      {
+        url: "/krado-og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Krado — IT Solutions That Scale",
+        type: "image/png",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Krado — IT Solutions That Scale",
+    description:
+      "Krado is a software development and IT services company delivering scalable, high-quality digital solutions for businesses worldwide.",
+    images: ["/krado-og-image.png"],
+  },
 };
 
 export default function RootLayout({
