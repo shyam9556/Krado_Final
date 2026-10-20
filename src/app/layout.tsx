@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     template: "%s | Krado",
   },
   description:
-    "Krado is a software development and IT services company delivering scalable, high-quality digital solutions for businesses worldwide.",
+    "Engineering software that creates leverage. Krado builds scalable products — from MVP to enterprise — with obsessive craft.",
   keywords: [
     "software development",
     "IT services",
@@ -67,7 +67,7 @@ export const metadata: Metadata = {
     siteName: "Krado",
     title: "Krado — IT Solutions That Scale",
     description:
-      "Krado is a software development and IT services company delivering scalable, high-quality digital solutions for businesses worldwide.",
+      "Engineering software that creates leverage. Krado builds scalable products — from MVP to enterprise — with obsessive craft.",
     images: [
       {
         url: "/krado-og-image.png",
@@ -82,7 +82,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Krado — IT Solutions That Scale",
     description:
-      "Krado is a software development and IT services company delivering scalable, high-quality digital solutions for businesses worldwide.",
+      "Engineering software that creates leverage. Krado builds scalable products — from MVP to enterprise — with obsessive craft.",
     images: ["/krado-og-image.png"],
   },
 };

@@ -93,7 +93,7 @@ export function Contact() {
       }
     } catch {
       setErrorMessage(
-        "Could not connect to the server. Please email us directly at hello@krado.co"
+        "Could not connect to the server. Please email us directly at info@kradotech.com"
       );
     } finally {
       setIsSubmitting(false);
@@ -147,8 +147,8 @@ export function Contact() {
               <div className="contact-direct-links">
                 <span className="contact-direct-label">OR EMAIL US DIRECTLY</span>
                 <Magnetic strength={0.15}>
-                  <a href="mailto:hello@krado.co" className="contact-email-link group">
-                    hello@krado.co
+                  <a href="mailto:info@kradotech.com" className="contact-email-link group">
+                    info@kradotech.com
                     <span className="contact-email-arrow">→</span>
                   </a>
                 </Magnetic>

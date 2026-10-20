@@ -19,16 +19,16 @@
 
 // ─── CONFIGURATION ──────────────────────────────────────────────────────────
 
-define('MAIL_TO',       'sakhiyashyam99@gmail.com, dakshborada@gmail.com');
-define('MAIL_FROM',     'walter0912345678@gmail.com');
+define('MAIL_TO',       'sakhiyashyam99@gmail.com, dakshborada@gmail.com, info@kradotech.com');
+define('MAIL_FROM',     'info@kradotech.com');
 define('MAIL_FROM_NAME','Krado Website');
 define('SITE_NAME',     'Krado');
 
-// Gmail SMTP — port 465 SMTPS (SSL from start, faster than 587 STARTTLS)
-define('SMTP_HOST', 'smtps://smtp.gmail.com');
+// cPanel SMTP — port 465 SMTPS (SSL). Uses your own server's mail, always open.
+define('SMTP_HOST', 'smtps://mail.kradotech.com');
 define('SMTP_PORT', 465);
-define('SMTP_USER', 'walter0912345678@gmail.com');
-define('SMTP_PASS', 'vgnz whrj kgxp ytaq');
+define('SMTP_USER', 'info@kradotech.com');
+define('SMTP_PASS', 'YOUR_CPANEL_EMAIL_PASSWORD'); // ← Replace with cPanel password for info@kradotech.com
 
 // Allowed origins
 define('ALLOWED_ORIGINS', [
@@ -349,5 +349,5 @@ try {
     respond(200, true, 'Thank you! We have received your project details and will follow up within 24 hours.');
 } catch (RuntimeException $e) {
     error_log("[Krado Contact] SMTP error: " . $e->getMessage() . " | From: {$email} | " . date('Y-m-d H:i:s'));
-    respond(500, false, 'Sorry, there was a problem sending your message. Please email us directly at hello@krado.co');
+    respond(500, false, 'Sorry, there was a problem sending your message. Please email us directly at info@kradotech.com');
 }
