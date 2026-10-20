@@ -1,0 +1,21 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Dark background -->
+  <rect width="512" height="512" fill="#0A0A0A"/>
+  <!-- Orange vertical bar — matches the brand accent from krado-logo-dark.svg -->
+  <rect x="40" y="80" width="36" height="352" fill="#FF5500"/>
+  <!-- K letterform — geometric, matches the bold style of the wordmark -->
+  <path d="
+    M 104,80
+    L 168,80
+    L 168,228
+    L 384,80
+    L 452,80
+    L 228,256
+    L 452,432
+    L 384,432
+    L 168,284
+    L 168,432
+    L 104,432
+    Z
+  " fill="white"/>
+</svg>

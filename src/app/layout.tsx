@@ -26,7 +26,7 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   metadataBase: new URL("https://kradotech.com"),
   title: {
-    default: "Krado — IT Solutions That Scale",
+    default: "Krado | IT Solutions That Scale",
     template: "%s | Krado",
   },
   description:
@@ -56,8 +56,16 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/krado-favicon-16x16.png", sizes: "16x16", type: "image/png" },
-      { url: "/krado-favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon.ico" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+    other: [
+      { rel: "manifest", url: "/site.webmanifest" },
     ],
   },
   openGraph: {
@@ -65,7 +73,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://kradotech.com",
     siteName: "Krado",
-    title: "Krado — IT Solutions That Scale",
+    title: "Krado | IT Solutions That Scale",
     description:
       "Engineering software that creates leverage. Krado builds scalable products — from MVP to enterprise — with obsessive craft.",
     images: [
@@ -73,14 +81,14 @@ export const metadata: Metadata = {
         url: "/krado-og-image.png",
         width: 1200,
         height: 630,
-        alt: "Krado — IT Solutions That Scale",
+        alt: "Krado | IT Solutions That Scale",
         type: "image/png",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Krado — IT Solutions That Scale",
+    title: "Krado | IT Solutions That Scale",
     description:
       "Engineering software that creates leverage. Krado builds scalable products — from MVP to enterprise — with obsessive craft.",
     images: ["/krado-og-image.png"],
@@ -99,6 +107,27 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col font-sans overflow-x-hidden">
+        {/* JSON-LD Organization schema — tells Google our brand name and logo */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "Krado",
+              url: "https://kradotech.com",
+              logo: "https://kradotech.com/favicon.svg",
+              sameAs: [
+                "https://kradotech.com",
+              ],
+              contactPoint: {
+                "@type": "ContactPoint",
+                email: "info@kradotech.com",
+                contactType: "customer support",
+              },
+            }),
+          }}
+        />
         {/* Blocking inline script — runs BEFORE React hydration.
             Must execute before any GSAP ScrollTrigger measures positions.
             useEffect/useLayoutEffect in components is too late — browser
